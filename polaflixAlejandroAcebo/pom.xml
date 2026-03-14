@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>es.unican.es</groupId>
+  <artifactId>polaflixAlejandroAcebo</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <dependencies>
+
+    <!-- Jakarta Validation API -->
+    <dependency>
+        <groupId>jakarta.validation</groupId>
+        <artifactId>jakarta.validation-api</artifactId>
+        <version>3.0.2</version>
+    </dependency>
+
+    <!-- Hibernate Validator (implementación) -->
+    <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>8.0.1.Final</version>
+    </dependency>
+
+    <!-- Expression Language -->
+    <dependency>
+        <groupId>org.glassfish</groupId>
+        <artifactId>jakarta.el</artifactId>
+        <version>4.0.2</version>
+    </dependency>
+
+    <!-- Jackson -->
+    <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.17.0</version>
+    </dependency>
+
+    <!-- Lombok -->
+    <dependency>
+	    <groupId>org.projectlombok</groupId>
+	    <artifactId>lombok</artifactId>
+	    <version>1.18.30</version>
+	    <scope>provided</scope>
+	</dependency>
+
+    <!-- Jakarta Persistence API -->
+    <dependency>
+        <groupId>jakarta.persistence</groupId>
+        <artifactId>jakarta.persistence-api</artifactId>
+        <version>3.1.0</version>
+    </dependency>
+
+    <!-- Hibernate Core (implementación JPA) -->
+    <dependency>
+        <groupId>org.hibernate.orm</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>6.2.7.Final</version>
+    </dependency>
+
+    <!-- Driver H2 para pruebas (opcional, cambiar a MySQL/Postgres si quieres) -->
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <version>2.2.224</version>
+    <scope>runtime</scope>
+</dependency>
+
+  </dependencies>
+</project>

@@ -1,0 +1,47 @@
+# =========================
+# Archivos del sistema
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Archivos temporales
+# =========================
+*.tmp
+*.temp
+*.swp
+*~
+*.log
+
+# =========================
+# Eclipse
+# =========================
+.metadata/
+.recommenders/
+
+# Configuraciones personales de Eclipse
+*.launch
+*.pydevproject
+.localhistory/
+
+# =========================
+# Archivos compilados Java
+# =========================
+*.class
+*.jar
+*.war
+*.ear
+
+# =========================
+# Carpetas de build
+# =========================
+bin/
+build/
+target/
+out/
+
+# =========================
+# Configuración IDE adicional
+# =========================
+.idea/
+.vscode/
