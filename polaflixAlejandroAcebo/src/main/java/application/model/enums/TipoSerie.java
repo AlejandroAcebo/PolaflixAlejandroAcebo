@@ -1,4 +1,4 @@
-package enums;
+package application.model.enums;
 
 public enum TipoSerie {
     ESTANDAR,

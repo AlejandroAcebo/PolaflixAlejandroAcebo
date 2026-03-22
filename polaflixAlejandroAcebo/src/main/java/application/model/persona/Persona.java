@@ -1,4 +1,4 @@
-package serie;
+package application.model.persona;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,21 +15,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Capitulo {
+public class Persona {
 
     @Id
     @GeneratedValue
-    private int idCapitulo;
+    private int idPersona;
     
-    private String nombreCapitulo;
-    
-    private int numeroCapitulo;
-    
-    private String enlace;
-    
-    private boolean visto;
-    
-    private String descripcion;
-    
-    
+    private String nombrePersona;
 }

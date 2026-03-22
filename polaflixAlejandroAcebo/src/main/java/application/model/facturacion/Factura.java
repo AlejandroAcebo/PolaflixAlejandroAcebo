@@ -1,18 +1,18 @@
-package serie;
+package application.model.facturacion;
 
+import java.time.LocalDate;
 import java.util.List;
 
-import enums.TipoSerie;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import persona.Persona;
 
 @Entity
 @Getter
@@ -20,21 +20,17 @@ import persona.Persona;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Serie {
+public class Factura {
 
     @Id
     @GeneratedValue
-    private int idSerie;
+    private int idFactura;
     
-    private String nombreSerie;
+    private LocalDate fecha;
     
-    private String sinopsis;
+    private double total;
     
-    private TipoSerie tipoSerie;
+    @ElementCollection
+    private List<Cargo> cargos;
     
-    private List<Temporada> temporadas;
-    
-    private List<Persona> creadores;
-    
-    private List<Persona> actores;
 }

@@ -1,8 +1,12 @@
-package facturacion;
+package application.model.facturacion;
 
 import java.time.LocalDate;
 
+import application.model.serie.Serie;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,5 +24,11 @@ public class Cargo {
     private int idCapitulo;
     
     private int idTemporada;
+    
+    @ManyToOne
+    @JoinColumn(name="idSerie")
+    private Serie serie;
+    
+    
 
 }

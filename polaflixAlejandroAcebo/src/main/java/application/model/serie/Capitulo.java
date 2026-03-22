@@ -1,10 +1,9 @@
-package serie;
-
-import java.util.List;
+package application.model.serie;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,15 +16,24 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Temporada {
+public class Capitulo {
 
     @Id
     @GeneratedValue
-    private int idTemporada;
+    private int idCapitulo;
     
-    private String nombreTemporada;
+    private String nombreCapitulo;
     
-    private int numeroTemporada;
+    private int numeroCapitulo;
     
-    private List<Capitulo> capitulos;
+    private String enlace;
+    
+    private boolean visto;
+    
+    private String descripcion;
+    
+    @ManyToOne
+    private Temporada temporada;
+    
+    
 }
