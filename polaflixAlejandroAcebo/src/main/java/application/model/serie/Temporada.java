@@ -35,4 +35,6 @@ public class Temporada {
     
     @OneToMany(mappedBy = "temporada", cascade = CascadeType.ALL)
     private List<Capitulo> capitulos;
+    
+    
 }

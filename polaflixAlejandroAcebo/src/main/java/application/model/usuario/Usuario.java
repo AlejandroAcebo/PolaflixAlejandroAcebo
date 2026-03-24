@@ -1,18 +1,27 @@
 package application.model.usuario;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import application.model.enums.EstadoSerie;
 import application.model.facturacion.Factura;
+import application.model.seguimientoserie.SeguimientoSerie;
+import application.model.seguimientoserie.Visualizacion;
+import application.model.serie.Capitulo;
 import application.model.serie.Serie;
 
 import static java.util.Objects.nonNull;
 
+
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,38 +47,46 @@ public class Usuario {
     
     private String cuentaBancaria;
     
-    private boolean cuotaFija;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idPlan")
+    private Plan plan;
     
     @OneToMany
     @JoinColumn(name = "idUsuario")
     private List<Factura> facturas;
     
-    @ManyToMany
-    @JoinTable(name = "usuario_series_terminadas")
-    private List<Serie> seriesTerminadas;
+    @OneToMany
+    private List<SeguimientoSerie> series; 
     
-    @ManyToMany
-    @JoinTable(name = "usuario_series_pendientes")
-    private List<Serie> seriesPendientes;
+    @OneToMany
+    private List<Visualizacion> visualizaciones;  
     
-    @ManyToMany
-    @JoinTable(name = "usuario_series_empezadas")
-    private List<Serie> seriesEmpezadas;
+    // PASAR A SERVICE
+//    public void agregarSeriePendiente(Serie seriePendiente) {
+//        boolean already =  false;
+//        if (nonNull(seriePendiente)) {
+//            for (SeguimientoSerie s: series) {
+//                if (s.getEstadoSerie().equals(EstadoSerie.PENDIENTE)) {
+//                    if(s.getSerie().getIdSerie() == seriePendiente.getIdSerie()) {
+//                        already = true;
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//        if (!already) {
+//            SeguimientoSerie seguimientoSerie = SeguimientoSerie.builder()
+//                    .estadoSerie(EstadoSerie.PENDIENTE)
+//                    .serie(seriePendiente)
+//                    .build();
+//            this.series.add(seguimientoSerie);
+//        }
+//    }
     
-    public void agregarSeriePendiente(Serie seriePendiente) {
-        boolean already =  false;
-        if (nonNull(seriePendiente)) {
-            for (Serie s: seriesPendientes) {
-                if(s.getIdSerie() == seriePendiente.getIdSerie()) {
-                    already = true;
-                    break;
-                    }
-                }
-        }
-        if (!already) {
-            this.seriesPendientes.add(seriePendiente);
-        }
-    }
+    // PASAR A SERVICE
+//    public void visualizarCapitulo(Capitulo capitulo) {  
+//        
+//    }
     
     
 }

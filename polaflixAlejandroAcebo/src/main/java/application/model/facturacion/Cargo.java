@@ -21,14 +21,11 @@ public class Cargo {
     
     private double precio;
     
+    private String nombreSerie;
+    
     private int idCapitulo;
     
     private int idTemporada;
-    
-    @ManyToOne
-    @JoinColumn(name="idSerie")
-    private Serie serie;
-    
     
 
 }
