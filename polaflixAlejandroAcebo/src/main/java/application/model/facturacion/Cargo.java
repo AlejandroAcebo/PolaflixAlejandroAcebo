@@ -2,19 +2,16 @@ package application.model.facturacion;
 
 import java.time.LocalDate;
 
-import application.model.serie.Serie;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
 
 @Value
 @Embeddable
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 public class Cargo {
     
     private LocalDate fecha;

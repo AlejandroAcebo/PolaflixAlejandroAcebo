@@ -1,13 +1,16 @@
 package application.model.usuario;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
-@Entity
+@NoArgsConstructor
+@DiscriminatorValue("FIJO")
 public class PlanFijo extends Plan{
     
     private final static double SUBSCRIPTION_PRICE =  20;
