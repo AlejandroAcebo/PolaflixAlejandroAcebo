@@ -1,21 +1,11 @@
 package application.model.usuario;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import application.model.enums.EstadoSerie;
 import application.model.facturacion.Factura;
 import application.model.seguimientoserie.SeguimientoSerie;
 import application.model.seguimientoserie.Visualizacion;
-import application.model.serie.Capitulo;
-import application.model.serie.Serie;
-
-import static java.util.Objects.nonNull;
-
-
-import jakarta.persistence.Embedded;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -53,14 +43,14 @@ public class Usuario {
     @JoinColumn(name = "idPlan")
     private Plan plan;
     
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "idUsuario")
     private List<Factura> facturas;
     
-    @OneToMany
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SeguimientoSerie> series; 
     
-    @OneToMany
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Visualizacion> visualizaciones;  
     
     // PASAR A SERVICE

@@ -22,13 +22,10 @@ import application.model.usuario.Plan;
 import application.model.usuario.PlanFijo;
 import application.model.usuario.PlanPorDemanda;
 import application.model.usuario.Usuario;
-import application.repository.FacturaRepository;
 import application.repository.PersonaRepository;
 import application.repository.PlanRepository;
-import application.repository.SeguimientoSerieRepository;
 import application.repository.SerieRepository;
 import application.repository.UsuarioRepository;
-import application.repository.VisualizacionRepository;
 
 @Component
 public class AppFeeder implements CommandLineRunner {
@@ -36,26 +33,17 @@ public class AppFeeder implements CommandLineRunner {
     private final PlanRepository planRepository;
     private final PersonaRepository personaRepository;
     private final SerieRepository serieRepository;
-    private final FacturaRepository facturaRepository;
     private final UsuarioRepository usuarioRepository;
-    private final SeguimientoSerieRepository seguimientoSerieRepository;
-    private final VisualizacionRepository visualizacionRepository;
 
     public AppFeeder(
             PlanRepository planRepository,
             PersonaRepository personaRepository,
             SerieRepository serieRepository,
-            FacturaRepository facturaRepository,
-            UsuarioRepository usuarioRepository,
-            SeguimientoSerieRepository seguimientoSerieRepository,
-            VisualizacionRepository visualizacionRepository) {
+            UsuarioRepository usuarioRepository) {
         this.planRepository = planRepository;
         this.personaRepository = personaRepository;
         this.serieRepository = serieRepository;
-        this.facturaRepository = facturaRepository;
         this.usuarioRepository = usuarioRepository;
-        this.seguimientoSerieRepository = seguimientoSerieRepository;
-        this.visualizacionRepository = visualizacionRepository;
     }
 
     @Override
@@ -91,18 +79,10 @@ public class AppFeeder implements CommandLineRunner {
                 .visualizaciones(new ArrayList<>())
                 .build();
 
-        usuarioRepository.saveAll(List.of(ana, mario));
-
         List<Visualizacion> visualizaciones = crearVisualizaciones(ana, mario, series);
-        visualizacionRepository.saveAll(visualizaciones);
-
         List<SeguimientoSerie> seguimientos = crearSeguimientos(ana, mario, series, visualizaciones);
-        seguimientoSerieRepository.saveAll(seguimientos);
-
         List<Factura> facturasAna = crearFacturasAna(series);
         List<Factura> facturasMario = crearFacturasMario(series);
-        facturaRepository.saveAll(facturasAna);
-        facturaRepository.saveAll(facturasMario);
 
         ana.setVisualizaciones(new ArrayList<>(List.of(
                 visualizaciones.get(0),
