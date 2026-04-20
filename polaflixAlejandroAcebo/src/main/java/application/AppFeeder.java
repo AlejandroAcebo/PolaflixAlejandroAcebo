@@ -2,7 +2,9 @@ package application;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -66,7 +68,8 @@ public class AppFeeder implements CommandLineRunner {
                 .plan(planes.get(0))
                 .facturas(new ArrayList<>())
                 .series(new ArrayList<>())
-                .visualizaciones(new ArrayList<>())
+                .visualizacionesPersistidas(new ArrayList<>())
+                .visualizaciones(new LinkedHashMap<>())
                 .build();
 
         Usuario mario = Usuario.builder()
@@ -76,7 +79,8 @@ public class AppFeeder implements CommandLineRunner {
                 .plan(planes.get(1))
                 .facturas(new ArrayList<>())
                 .series(new ArrayList<>())
-                .visualizaciones(new ArrayList<>())
+                .visualizacionesPersistidas(new ArrayList<>())
+                .visualizaciones(new LinkedHashMap<>())
                 .build();
 
         List<Visualizacion> visualizaciones = crearVisualizaciones(ana, mario, series);
@@ -84,13 +88,8 @@ public class AppFeeder implements CommandLineRunner {
         List<Factura> facturasAna = crearFacturasAna(series);
         List<Factura> facturasMario = crearFacturasMario(series);
 
-        ana.setVisualizaciones(new ArrayList<>(List.of(
-                visualizaciones.get(0),
-                visualizaciones.get(1),
-                visualizaciones.get(2))));
-        mario.setVisualizaciones(new ArrayList<>(List.of(
-                visualizaciones.get(3),
-                visualizaciones.get(4))));
+        ana.setVisualizaciones(crearMapaVisualizacionesAna(series, visualizaciones));
+        mario.setVisualizaciones(crearMapaVisualizacionesMario(series, visualizaciones));
         ana.setSeries(new ArrayList<>(List.of(seguimientos.get(0), seguimientos.get(1))));
         mario.setSeries(new ArrayList<>(List.of(seguimientos.get(2), seguimientos.get(3))));
         ana.setFacturas(new ArrayList<>(facturasAna));
@@ -298,6 +297,27 @@ public class AppFeeder implements CommandLineRunner {
                 .build();
 
         return List.of(s1, s2, s3, s4);
+    }
+
+    private Map<Serie, List<Visualizacion>> crearMapaVisualizacionesAna(
+            List<Serie> series,
+            List<Visualizacion> visualizaciones) {
+        Map<Serie, List<Visualizacion>> visualizacionesAna = new LinkedHashMap<>();
+        visualizacionesAna.put(series.get(0), new ArrayList<>(List.of(
+                visualizaciones.get(0),
+                visualizaciones.get(1))));
+        visualizacionesAna.put(series.get(1), new ArrayList<>(List.of(visualizaciones.get(2))));
+        return visualizacionesAna;
+    }
+
+    private Map<Serie, List<Visualizacion>> crearMapaVisualizacionesMario(
+            List<Serie> series,
+            List<Visualizacion> visualizaciones) {
+        Map<Serie, List<Visualizacion>> visualizacionesMario = new LinkedHashMap<>();
+        visualizacionesMario.put(series.get(2), new ArrayList<>(List.of(
+                visualizaciones.get(3),
+                visualizaciones.get(4))));
+        return visualizacionesMario;
     }
 
     private List<Factura> crearFacturasAna(List<Serie> series) {
