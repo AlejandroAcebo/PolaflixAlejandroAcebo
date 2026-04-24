@@ -1,10 +1,10 @@
-package application.model.facturacion;
+package application.model.entity.facturacion;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import application.model.seguimientoserie.Visualizacion;
+import application.model.entity.seguimientoserie.Visualizacion;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;

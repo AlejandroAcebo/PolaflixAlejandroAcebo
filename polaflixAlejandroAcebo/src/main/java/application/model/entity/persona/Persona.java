@@ -1,6 +1,6 @@
-package application.model.persona;
+package application.model.entity.persona;
 
-import application.model.seguimientoserie.Visualizacion;
+import application.model.entity.seguimientoserie.Visualizacion;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;

@@ -1,14 +1,11 @@
-package application.model.serie;
+package application.model.entity.serie;
 
-import java.util.List;
-
-import application.model.seguimientoserie.Visualizacion;
-import jakarta.persistence.CascadeType;
+import application.model.entity.seguimientoserie.Visualizacion;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -23,21 +20,23 @@ import lombok.Setter;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Builder
-public class Temporada {
+public class Capitulo {
 
     @Id
     @GeneratedValue
-    private int idTemporada;
+    private int idCapitulo;
+    
+    private String nombreCapitulo;
+    
+    private int numeroCapitulo;
+    
+    private String enlace;
+    
+    private String descripcion;
     
     @ManyToOne
-    private Serie serie;
-    
-    private String nombreTemporada;
-    
-    private int numeroTemporada;
-    
-    @OneToMany(mappedBy = "temporada", cascade = CascadeType.ALL)
-    private List<Capitulo> capitulos;
+    @JoinColumn(name = "idTemporada", nullable = false)
+    private Temporada temporada;
     
     
 }

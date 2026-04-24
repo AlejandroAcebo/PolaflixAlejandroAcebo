@@ -1,4 +1,4 @@
-package application.model.usuario;
+package application.model.entity.usuario;
 
 import java.util.List;
 import java.util.LinkedHashMap;
@@ -7,11 +7,11 @@ import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
 
-import application.model.facturacion.Factura;
-import application.model.seguimientoserie.SeguimientoSerie;
-import application.model.seguimientoserie.Visualizacion;
-import application.model.serie.Capitulo;
-import application.model.serie.Serie;
+import application.model.entity.facturacion.Factura;
+import application.model.entity.seguimientoserie.SeguimientoSerie;
+import application.model.entity.seguimientoserie.Visualizacion;
+import application.model.entity.serie.Capitulo;
+import application.model.entity.serie.Serie;
 import application.model.enums.EstadoSerie;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

@@ -717,7 +717,7 @@
 											"top": 93,
 											"width": 308.19775390625,
 											"height": 13,
-											"text": "+total: double",
+											"text": "+/total: double",
 											"horizontalAlignment": 0
 										}
 									],
@@ -6152,19 +6152,6 @@
 							}
 						},
 						{
-							"_type": "UMLNoteView",
-							"_id": "AAAAAAGdFvySdMNbGNU=",
-							"_parent": {
-								"$ref": "AAAAAAFF+qBtyKM79qY="
-							},
-							"font": "Arial;13;0",
-							"left": 1288,
-							"top": 56,
-							"width": 153,
-							"height": 38,
-							"text": "total es un campo calculado"
-						},
-						{
 							"_type": "UMLAssociationView",
 							"_id": "AAAAAAGdGzOk8LaEybs=",
 							"_parent": {
@@ -7554,7 +7541,8 @@
 								"$ref": "AAAAAAGcrw53zeYLUiE="
 							},
 							"name": "total",
-							"type": "double"
+							"type": "double",
+							"isDerived": true
 						}
 					],
 					"operations": [

@@ -1,4 +1,4 @@
-package application.model.usuario;
+package application.model.entity.usuario;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
@@ -6,18 +6,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
 @Getter
 @Setter
+@Entity
 @NoArgsConstructor
-@DiscriminatorValue("FIJO")
-public class PlanFijo extends Plan{
-    
-    private final static double SUBSCRIPTION_PRICE =  20;
-    
+@DiscriminatorValue("DEMANDA")
+public class PlanPorDemanda extends Plan{
+
     @Override
     public double calcularCoste() {
-        return SUBSCRIPTION_PRICE;
+        
+        return 0;
     }
 
 }

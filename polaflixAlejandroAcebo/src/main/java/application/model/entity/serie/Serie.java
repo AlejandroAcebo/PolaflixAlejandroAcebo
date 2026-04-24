@@ -1,10 +1,10 @@
-package application.model.serie;
+package application.model.entity.serie;
 
 import java.util.List;
 
+import application.model.entity.persona.Persona;
+import application.model.entity.seguimientoserie.Visualizacion;
 import application.model.enums.TipoSerie;
-import application.model.persona.Persona;
-import application.model.seguimientoserie.Visualizacion;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

@@ -1,10 +1,10 @@
-package application.model.seguimientoserie;
+package application.model.entity.seguimientoserie;
 import java.time.LocalDate;
 
+import application.model.entity.serie.Capitulo;
+import application.model.entity.serie.Serie;
+import application.model.entity.usuario.Usuario;
 import application.model.enums.EstadoSerie;
-import application.model.serie.Capitulo;
-import application.model.serie.Serie;
-import application.model.usuario.Usuario;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;

@@ -1,11 +1,11 @@
-package application.model.usuario;
+package application.model.entity.usuario;
 
 import java.util.List;
 
-import application.model.seguimientoserie.Visualizacion;
-import application.model.serie.Capitulo;
-import application.model.serie.Serie;
-import application.model.serie.Temporada;
+import application.model.entity.seguimientoserie.Visualizacion;
+import application.model.entity.serie.Capitulo;
+import application.model.entity.serie.Serie;
+import application.model.entity.serie.Temporada;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
