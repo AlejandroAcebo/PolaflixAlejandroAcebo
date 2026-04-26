@@ -85,8 +85,8 @@ public class AppFeeder implements CommandLineRunner {
 
         List<Visualizacion> visualizaciones = crearVisualizaciones(ana, mario, series);
         List<SeguimientoSerie> seguimientos = crearSeguimientos(ana, mario, series, visualizaciones);
-        List<Factura> facturasAna = crearFacturasAna(series);
-        List<Factura> facturasMario = crearFacturasMario(series);
+        List<Factura> facturasAna = crearFacturasAna(ana, series);
+        List<Factura> facturasMario = crearFacturasMario(mario, series);
 
         ana.setVisualizaciones(crearMapaVisualizacionesAna(series, visualizaciones));
         mario.setVisualizaciones(crearMapaVisualizacionesMario(series, visualizaciones));
@@ -320,33 +320,43 @@ public class AppFeeder implements CommandLineRunner {
         return visualizacionesMario;
     }
 
-    private List<Factura> crearFacturasAna(List<Serie> series) {
+    private List<Factura> crearFacturasAna(Usuario ana, List<Serie> series) {
         Capitulo bbPilot = series.get(0).getTemporadas().get(0).getCapitulos().get(0);
         Capitulo bbEpisode2 = series.get(0).getTemporadas().get(0).getCapitulos().get(1);
 
         Factura facturaMarzo = Factura.builder()
                 .fecha(LocalDate.of(2026, 3, 31))
+                .usuario(ana)
                 .cargos(List.of(
-                        new Cargo(LocalDate.of(2026, 3, 3), 9.99, series.get(0).getNombreSerie(),
-                                bbPilot.getIdCapitulo(), bbPilot.getTemporada().getNumeroTemporada()),
-                        new Cargo(LocalDate.of(2026, 3, 4), 10.00, series.get(0).getNombreSerie(),
-                                bbEpisode2.getIdCapitulo(), bbEpisode2.getTemporada().getNumeroTemporada())))
+                        new Cargo(LocalDate.of(2026, 3, 3), 9.99,
+                                series.get(0).getNombreSerie(),
+                                bbPilot.getIdCapitulo(),
+                                bbPilot.getTemporada().getNumeroTemporada()),
+                        new Cargo(LocalDate.of(2026, 3, 4), 10.00,
+                                series.get(0).getNombreSerie(),
+                                bbEpisode2.getIdCapitulo(),
+                                bbEpisode2.getTemporada().getNumeroTemporada())))
                 .build();
 
         return List.of(facturaMarzo);
-    }
+   }
 
-    private List<Factura> crearFacturasMario(List<Serie> series) {
+    private List<Factura> crearFacturasMario(Usuario mario, List<Serie> series) {
         Capitulo friendsEpisode1 = series.get(2).getTemporadas().get(0).getCapitulos().get(0);
         Capitulo friendsEpisode2 = series.get(2).getTemporadas().get(0).getCapitulos().get(1);
 
         Factura facturaMarzo = Factura.builder()
                 .fecha(LocalDate.of(2026, 3, 31))
+                .usuario(mario)
                 .cargos(List.of(
-                        new Cargo(LocalDate.of(2026, 3, 8), 3.99, series.get(2).getNombreSerie(),
-                                friendsEpisode1.getIdCapitulo(), friendsEpisode1.getTemporada().getNumeroTemporada()),
-                        new Cargo(LocalDate.of(2026, 3, 9), 3.99, series.get(2).getNombreSerie(),
-                                friendsEpisode2.getIdCapitulo(), friendsEpisode2.getTemporada().getNumeroTemporada())))
+                        new Cargo(LocalDate.of(2026, 3, 8), 3.99,
+                                series.get(2).getNombreSerie(),
+                                friendsEpisode1.getIdCapitulo(),
+                                friendsEpisode1.getTemporada().getNumeroTemporada()),
+                        new Cargo(LocalDate.of(2026, 3, 9), 3.99,
+                                series.get(2).getNombreSerie(),
+                                friendsEpisode2.getIdCapitulo(),
+                                friendsEpisode2.getTemporada().getNumeroTemporada())))
                 .build();
 
         return List.of(facturaMarzo);

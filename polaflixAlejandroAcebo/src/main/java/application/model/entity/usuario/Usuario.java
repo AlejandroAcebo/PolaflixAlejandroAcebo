@@ -49,12 +49,11 @@ public class Usuario {
     
     private String cuentaBancaria;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "idPlan")
     private Plan plan;
     
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "idUsuario")
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Factura> facturas;
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -85,38 +84,6 @@ public class Usuario {
                     .build();
             this.series.add(seguimientoSerie);
         }
-    }
-    
-    @PostLoad
-    public void reconstruirMapaVisualizaciones() {
-        if (visualizacionesPersistidas == null) {
-            visualizacionesPersistidas = new java.util.ArrayList<>();
-        }
-        visualizaciones = new LinkedHashMap<>();
-        for (Visualizacion visualizacion : visualizacionesPersistidas) {
-            Serie serie = visualizacion.getCapitulo().getTemporada().getSerie();
-            visualizaciones.computeIfAbsent(serie, key -> new java.util.ArrayList<>()).add(visualizacion);
-        }
-    }
-    
-    public Map<Serie, List<Visualizacion>> getVisualizaciones() {
-        if (visualizaciones == null) {
-            reconstruirMapaVisualizaciones();
-        }
-        return visualizaciones;
-    }
-    
-    public void setVisualizaciones(Map<Serie, List<Visualizacion>> visualizaciones) {
-        this.visualizaciones = new LinkedHashMap<>();
-        this.visualizacionesPersistidas = new java.util.ArrayList<>();
-        if (visualizaciones == null) {
-            return;
-        }
-        visualizaciones.forEach((serie, listaVisualizaciones) -> {
-            List<Visualizacion> lista = new java.util.ArrayList<>(listaVisualizaciones);
-            this.visualizaciones.put(serie, lista);
-            this.visualizacionesPersistidas.addAll(lista);
-        });
     }
     
     public void visualizarCapitulo(Capitulo capitulo, Serie serie) { 
