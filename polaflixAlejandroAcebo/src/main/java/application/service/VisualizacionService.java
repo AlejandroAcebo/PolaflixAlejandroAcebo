@@ -1,19 +1,18 @@
 package application.service;
 
-import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
+import application.exception.ResourceNotFoundException;
 import application.model.dto.visualizacion.VisualizacionRequestDto;
-import application.model.dto.visualizacion.VisualizacionResponseDto;
 import application.model.entity.serie.Capitulo;
 import application.model.entity.seguimientoserie.Visualizacion;
+import application.model.entity.seguimientoserie.SeguimientoSerie;
 import application.model.entity.usuario.Usuario;
 import application.repository.CapituloRepository;
+import application.repository.SeguimientoSerieRepository;
 import application.repository.UsuarioRepository;
 import application.repository.VisualizacionRepository;
 
@@ -22,44 +21,51 @@ public class VisualizacionService {
     private final VisualizacionRepository visualizacionRepository;
     private final UsuarioRepository usuarioRepository;
     private final CapituloRepository capituloRepository;
+    private final SeguimientoSerieRepository seguimientoSerieRepository;
 
     public VisualizacionService(VisualizacionRepository visualizacionRepository, 
                                  UsuarioRepository usuarioRepository, 
-                                 CapituloRepository capituloRepository) {
+                                 CapituloRepository capituloRepository,
+                                 SeguimientoSerieRepository seguimientoSerieRepository) {
         this.visualizacionRepository = visualizacionRepository;
         this.usuarioRepository = usuarioRepository;
         this.capituloRepository = capituloRepository;
+        this.seguimientoSerieRepository = seguimientoSerieRepository;
     }
 
     @Transactional(readOnly = true)
-    public List<VisualizacionResponseDto> findByUsuarioId(int usuarioId) {
+    public List<Visualizacion> findByUsuarioId(int usuarioId) {
         validarUsuarioExiste(usuarioId);
-        return visualizacionRepository.findByUsuarioIdUsuario(usuarioId).stream()
-                .map(this::toResponse)
-                .toList();
+        return visualizacionRepository.findByUsuarioIdUsuario(usuarioId);
     }
 
     @Transactional(readOnly = true)
-    public VisualizacionResponseDto findById(int idVisualizacion) {
-        return toResponse(getVisualizacionById(idVisualizacion));
+    public Visualizacion findById(int idVisualizacion) {
+        return getVisualizacionById(idVisualizacion);
     }
 
     @Transactional
-    public VisualizacionResponseDto create(int usuarioId, VisualizacionRequestDto request) {
-        if (request.getIdCapitulo() <= 0) {
-            throw new IllegalArgumentException("El ID del capítulo debe ser positivo");
-        }
-
+    public Visualizacion create(int usuarioId, VisualizacionRequestDto request) {
         Usuario usuario = validarUsuarioExiste(usuarioId);
         Capitulo capitulo = validarCapituloExiste(request.getIdCapitulo());
+        int serieId = capitulo.getTemporada().getSerie().getIdSerie();
+        SeguimientoSerie seguimiento = seguimientoSerieRepository
+                .findByUsuarioIdUsuarioAndSerieIdSerie(usuarioId, serieId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "La serie no esta en el espacio personal del usuario"));
 
-        Visualizacion visualizacion = Visualizacion.builder()
-                .usuario(usuario)
-                .capitulo(capitulo)
-                .fechaVisualizacion(LocalDate.now())
-                .build();
+        var visualizacionExistente = visualizacionRepository
+                .findByUsuarioIdUsuarioAndCapituloIdCapitulo(usuarioId, request.getIdCapitulo());
+        if (visualizacionExistente.isPresent()) {
+            actualizarSeguimiento(usuarioId, seguimiento, capitulo);
+            return visualizacionExistente.get();
+        }
 
-        return toResponse(visualizacionRepository.save(visualizacion));
+        Visualizacion visualizacion = usuario.visualizarCapitulo(capitulo, seguimiento.getSerie());
+        Visualizacion saved = visualizacionRepository.save(visualizacion);
+        actualizarSeguimiento(usuarioId, seguimiento, capitulo);
+
+        return saved;
     }
 
     @Transactional
@@ -70,31 +76,28 @@ public class VisualizacionService {
 
     private Visualizacion getVisualizacionById(int idVisualizacion) {
         return visualizacionRepository.findById(idVisualizacion)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe la visualización con id " + idVisualizacion));
     }
 
     private Usuario validarUsuarioExiste(int idUsuario) {
         return usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe el usuario con id " + idUsuario));
     }
 
     private Capitulo validarCapituloExiste(int idCapitulo) {
         return capituloRepository.findById(idCapitulo)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe el capítulo con id " + idCapitulo));
     }
 
-    private VisualizacionResponseDto toResponse(Visualizacion visualizacion) {
-        return new VisualizacionResponseDto(
-                visualizacion.getIdVisualizacion(),
-                visualizacion.getUsuario().getIdUsuario(),
-                visualizacion.getCapitulo().getIdCapitulo(),
-                visualizacion.getFechaVisualizacion().toString()
-        );
+    private void actualizarSeguimiento(
+            int usuarioId,
+            SeguimientoSerie seguimiento,
+            Capitulo capituloFallback) {
+        List<Visualizacion> visualizaciones = visualizacionRepository.findByUsuarioIdUsuario(usuarioId);
+        seguimiento.registrarVisualizacion(capituloFallback, visualizaciones);
+        seguimientoSerieRepository.save(seguimiento);
     }
 }

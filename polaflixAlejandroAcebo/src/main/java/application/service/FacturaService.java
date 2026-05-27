@@ -2,12 +2,10 @@ package application.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
-import application.model.dto.factura.FacturaResponseDto;
+import application.exception.ResourceNotFoundException;
 import application.model.entity.facturacion.Factura;
 import application.model.entity.usuario.Usuario;
 import application.repository.FacturaRepository;
@@ -24,45 +22,30 @@ public class FacturaService {
     }
 
     @Transactional(readOnly = true)
-    public List<FacturaResponseDto> findByUsuarioId(int usuarioId) {
+    public List<Factura> findByUsuarioId(int usuarioId) {
         validarUsuarioExiste(usuarioId);
-        return facturaRepository.findByUsuarioIdUsuario(usuarioId).stream()
-                .map(this::toResponse)
-                .toList();
+        return facturaRepository.findByUsuarioIdUsuario(usuarioId);
     }
 
     @Transactional(readOnly = true)
-    public List<FacturaResponseDto> findAll() {
-        return facturaRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public List<Factura> findAll() {
+        return facturaRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public FacturaResponseDto findById(int idFactura) {
-        return toResponse(getFacturaById(idFactura));
+    public Factura findById(int idFactura) {
+        return getFacturaById(idFactura);
     }
 
     private Factura getFacturaById(int idFactura) {
         return facturaRepository.findById(idFactura)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe la factura con id " + idFactura));
     }
 
     private Usuario validarUsuarioExiste(int idUsuario) {
         return usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe el usuario con id " + idUsuario));
-    }
-
-    private FacturaResponseDto toResponse(Factura factura) {
-        return new FacturaResponseDto(
-                factura.getIdFactura(),
-                factura.getUsuario().getIdUsuario(),
-                factura.getFecha().toString(),
-                factura.getTotal()
-        );
     }
 }

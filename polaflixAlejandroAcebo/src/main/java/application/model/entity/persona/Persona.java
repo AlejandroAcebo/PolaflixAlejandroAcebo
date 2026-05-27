@@ -1,12 +1,12 @@
 package application.model.entity.persona;
 
-import application.model.entity.seguimientoserie.Visualizacion;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,8 +16,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Persona {
 
     @Id
@@ -25,4 +25,20 @@ public class Persona {
     private int idPersona;
     
     private String nombrePersona;
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof Persona persona)) {
+            return false;
+        }
+        return idPersona != 0 && idPersona == persona.idPersona;
+    }
+
+    @Override
+    public int hashCode() {
+        return Persona.class.hashCode();
+    }
 }

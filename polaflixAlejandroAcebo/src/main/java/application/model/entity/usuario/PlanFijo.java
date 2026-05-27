@@ -12,12 +12,15 @@ import lombok.Setter;
 @NoArgsConstructor
 @DiscriminatorValue("FIJO")
 public class PlanFijo extends Plan{
-    
-    private final static double SUBSCRIPTION_PRICE =  20;
-    
+
     @Override
     public double calcularCoste() {
-        return SUBSCRIPTION_PRICE;
+        return getPrecio();
+    }
+
+    @Override
+    public boolean esCuotaFija() {
+        return true;
     }
 
 }

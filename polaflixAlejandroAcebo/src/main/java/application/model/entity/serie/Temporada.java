@@ -2,7 +2,10 @@ package application.model.entity.serie;
 
 import java.util.List;
 
-import application.model.entity.seguimientoserie.Visualizacion;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,7 +14,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,8 +23,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Temporada {
 
     @Id
@@ -30,6 +32,7 @@ public class Temporada {
     private int idTemporada;
     
     @ManyToOne
+    @JsonIgnore
     private Serie serie;
     
     private String nombreTemporada;
@@ -37,7 +40,48 @@ public class Temporada {
     private int numeroTemporada;
     
     @OneToMany(mappedBy = "temporada", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Capitulo> capitulos;
-    
-    
+
+    public static Temporada crear(Serie serie, String nombreTemporada, int numeroTemporada) {
+        return Temporada.builder()
+                .serie(serie)
+                .nombreTemporada(nombreTemporada)
+                .numeroTemporada(numeroTemporada)
+                .build();
+    }
+
+    @JsonProperty("idSerie")
+    public int getIdSerie() {
+        return serie == null ? 0 : serie.getIdSerie();
+    }
+
+    public void actualizarDatos(String nombreTemporada, int numeroTemporada) {
+        if (tieneTexto(nombreTemporada)) {
+            this.nombreTemporada = nombreTemporada;
+        }
+        if (numeroTemporada > 0) {
+            this.numeroTemporada = numeroTemporada;
+        }
+    }
+
+    private boolean tieneTexto(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof Temporada temporada)) {
+            return false;
+        }
+        return idTemporada != 0 && idTemporada == temporada.idTemporada;
+    }
+
+    @Override
+    public int hashCode() {
+        return Temporada.class.hashCode();
+    }
 }

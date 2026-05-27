@@ -1,11 +1,8 @@
 package application.model.entity.usuario;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import application.model.entity.seguimientoserie.Visualizacion;
-import application.model.entity.serie.Capitulo;
-import application.model.entity.serie.Serie;
-import application.model.entity.serie.Temporada;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
@@ -13,7 +10,6 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,9 +20,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_plan", discriminatorType = DiscriminatorType.STRING)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public abstract class Plan {
 
     @Id
@@ -35,4 +31,27 @@ public abstract class Plan {
     protected double precio;
     
     public abstract double calcularCoste();
+
+    public abstract boolean esCuotaFija();
+
+    @JsonProperty("tipoPlan")
+    public String getTipoPlan() {
+        return getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof Plan plan)) {
+            return false;
+        }
+        return idPlan != 0 && idPlan == plan.idPlan;
+    }
+
+    @Override
+    public int hashCode() {
+        return Plan.class.hashCode();
+    }
 }

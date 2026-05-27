@@ -2,8 +2,9 @@ package application.model.entity.facturacion;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import application.model.entity.usuario.Usuario;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -14,7 +15,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,8 +24,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Factura {
 
     @Id
@@ -36,15 +36,37 @@ public class Factura {
     
     @ManyToOne
     @JoinColumn(name = "idUsuario", nullable = false)
+    @JsonIgnore
     private Usuario usuario;
 
     public double getTotal() {
-        return cargos.stream()
+        return cargos == null ? 0 : cargos.stream()
         .mapToDouble(Cargo::getPrecio)
         .sum(); 
     }
+
+    @JsonProperty("idUsuario")
+    public int getIdUsuario() {
+        return usuario == null ? 0 : usuario.getIdUsuario();
+    }
     
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<Cargo> cargos;
-    
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof Factura factura)) {
+            return false;
+        }
+        return idFactura != 0 && idFactura == factura.idFactura;
+    }
+
+    @Override
+    public int hashCode() {
+        return Factura.class.hashCode();
+    }
 }

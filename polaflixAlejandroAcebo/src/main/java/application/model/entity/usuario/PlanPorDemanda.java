@@ -19,4 +19,9 @@ public class PlanPorDemanda extends Plan{
         return 0;
     }
 
+    @Override
+    public boolean esCuotaFija() {
+        return false;
+    }
+
 }

@@ -2,16 +2,13 @@ package application.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
+import application.exception.ResourceNotFoundException;
 import application.model.dto.serie.SerieRequestDto;
-import application.model.dto.serie.SerieResponseDto;
 import application.model.entity.serie.Serie;
 import application.repository.SerieRepository;
-import io.micrometer.common.util.StringUtils;
 
 @Service
 public class SerieService {
@@ -22,44 +19,31 @@ public class SerieService {
     }
 
     @Transactional(readOnly = true)
-    public List<SerieResponseDto> findAll() {
-        return serieRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public List<Serie> findAll() {
+        return serieRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public SerieResponseDto findById(int idSerie) {
-        return toResponse(getSerieById(idSerie));
+    public Serie findById(int idSerie) {
+        return getSerieById(idSerie);
     }
 
     @Transactional
-    public SerieResponseDto create(SerieRequestDto request) {
-        if (StringUtils.isBlank(request.getNombreSerie())) {
-            throw new IllegalArgumentException("El nombre de la serie no puede estar vacío");
-        }
+    public Serie create(SerieRequestDto request) {
+        Serie serie = Serie.crear(
+                request.getNombreSerie(),
+                request.getSinopsis(),
+                request.getTipoSerie());
 
-        Serie serie = Serie.builder()
-                .nombreSerie(request.getNombreSerie())
-                .sinopsis(request.getSinopsis())
-                .tipoSerie(null)
-                .build();
-
-        return toResponse(serieRepository.save(serie));
+        return serieRepository.save(serie);
     }
 
     @Transactional
-    public SerieResponseDto update(int idSerie, SerieRequestDto request) {
+    public Serie update(int idSerie, SerieRequestDto request) {
         Serie serie = getSerieById(idSerie);
+        serie.actualizarDatos(request.getNombreSerie(), request.getSinopsis(), request.getTipoSerie());
 
-        if (StringUtils.isNotBlank(request.getNombreSerie())) {
-            serie.setNombreSerie(request.getNombreSerie());
-        }
-        if (StringUtils.isNotBlank(request.getSinopsis())) {
-            serie.setSinopsis(request.getSinopsis());
-        }
-
-        return toResponse(serieRepository.save(serie));
+        return serieRepository.save(serie);
     }
 
     @Transactional
@@ -70,17 +54,7 @@ public class SerieService {
 
     private Serie getSerieById(int idSerie) {
         return serieRepository.findById(idSerie)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe la serie con id " + idSerie));
-    }
-
-    private SerieResponseDto toResponse(Serie serie) {
-        return new SerieResponseDto(
-                serie.getIdSerie(),
-                serie.getNombreSerie(),
-                serie.getSinopsis(),
-                serie.getTipoSerie() != null ? serie.getTipoSerie().toString() : "DESCONOCIDO"
-        );
     }
 }

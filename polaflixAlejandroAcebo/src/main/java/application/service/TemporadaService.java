@@ -2,18 +2,15 @@ package application.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
+import application.exception.ResourceNotFoundException;
 import application.model.dto.temporada.TemporadaRequestDto;
-import application.model.dto.temporada.TemporadaResponseDto;
 import application.model.entity.serie.Serie;
 import application.model.entity.serie.Temporada;
 import application.repository.SerieRepository;
 import application.repository.TemporadaRepository;
-import io.micrometer.common.util.StringUtils;
 
 @Service
 public class TemporadaService {
@@ -26,57 +23,39 @@ public class TemporadaService {
     }
 
     @Transactional(readOnly = true)
-    public List<TemporadaResponseDto> findAll() {
-        return temporadaRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public List<Temporada> findAll() {
+        return temporadaRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public List<TemporadaResponseDto> findBySerieId(int serieId) {
+    public List<Temporada> findBySerieId(int serieId) {
         validarSerieExiste(serieId);
-        return temporadaRepository.findBySerieIdSerie(serieId).stream()
-                .map(this::toResponse)
-                .toList();
+        return temporadaRepository.findBySerieIdSerie(serieId);
     }
 
     @Transactional(readOnly = true)
-    public TemporadaResponseDto findById(int idTemporada) {
-        return toResponse(getTemporadaById(idTemporada));
+    public Temporada findById(int idTemporada) {
+        return getTemporadaById(idTemporada);
     }
 
     @Transactional
-    public TemporadaResponseDto create(TemporadaRequestDto request) {
-        if (StringUtils.isBlank(request.getNombreTemporada())) {
-            throw new IllegalArgumentException("El nombre de la temporada no puede estar vacío");
-        }
-        if (request.getNumeroTemporada() <= 0) {
-            throw new IllegalArgumentException("El número de la temporada debe ser positivo");
-        }
-
+    public Temporada create(TemporadaRequestDto request) {
         Serie serie = validarSerieExiste(request.getIdSerie());
 
-        Temporada temporada = Temporada.builder()
-                .serie(serie)
-                .nombreTemporada(request.getNombreTemporada())
-                .numeroTemporada(request.getNumeroTemporada())
-                .build();
+        Temporada temporada = Temporada.crear(
+                serie,
+                request.getNombreTemporada(),
+                request.getNumeroTemporada());
 
-        return toResponse(temporadaRepository.save(temporada));
+        return temporadaRepository.save(temporada);
     }
 
     @Transactional
-    public TemporadaResponseDto update(int idTemporada, TemporadaRequestDto request) {
+    public Temporada update(int idTemporada, TemporadaRequestDto request) {
         Temporada temporada = getTemporadaById(idTemporada);
+        temporada.actualizarDatos(request.getNombreTemporada(), request.getNumeroTemporada());
 
-        if (StringUtils.isNotBlank(request.getNombreTemporada())) {
-            temporada.setNombreTemporada(request.getNombreTemporada());
-        }
-        if (request.getNumeroTemporada() > 0) {
-            temporada.setNumeroTemporada(request.getNumeroTemporada());
-        }
-
-        return toResponse(temporadaRepository.save(temporada));
+        return temporadaRepository.save(temporada);
     }
 
     @Transactional
@@ -87,24 +66,13 @@ public class TemporadaService {
 
     private Temporada getTemporadaById(int idTemporada) {
         return temporadaRepository.findById(idTemporada)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe la temporada con id " + idTemporada));
     }
 
     private Serie validarSerieExiste(int idSerie) {
         return serieRepository.findById(idSerie)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe la serie con id " + idSerie));
-    }
-
-    private TemporadaResponseDto toResponse(Temporada temporada) {
-        return new TemporadaResponseDto(
-                temporada.getIdTemporada(),
-                temporada.getSerie().getIdSerie(),
-                temporada.getNombreTemporada(),
-                temporada.getNumeroTemporada()
-        );
     }
 }

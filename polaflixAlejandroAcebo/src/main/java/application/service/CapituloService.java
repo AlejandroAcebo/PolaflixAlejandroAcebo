@@ -2,18 +2,15 @@ package application.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
+import application.exception.ResourceNotFoundException;
 import application.model.dto.capitulo.CapituloRequestDto;
-import application.model.dto.capitulo.CapituloResponseDto;
 import application.model.entity.serie.Capitulo;
 import application.model.entity.serie.Temporada;
 import application.repository.CapituloRepository;
 import application.repository.TemporadaRepository;
-import io.micrometer.common.util.StringUtils;
 
 @Service
 public class CapituloService {
@@ -26,68 +23,45 @@ public class CapituloService {
     }
 
     @Transactional(readOnly = true)
-    public List<CapituloResponseDto> findAll() {
-        return capituloRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public List<Capitulo> findAll() {
+        return capituloRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public List<CapituloResponseDto> findByTemporadaId(int temporadaId) {
+    public List<Capitulo> findByTemporadaId(int temporadaId) {
         validarTemporadaExiste(temporadaId);
-        return capituloRepository.findByTemporadaIdTemporada(temporadaId).stream()
-                .map(this::toResponse)
-                .toList();
+        return capituloRepository.findByTemporadaIdTemporada(temporadaId);
     }
 
     @Transactional(readOnly = true)
-    public CapituloResponseDto findById(int idCapitulo) {
-        return toResponse(getCapituloById(idCapitulo));
+    public Capitulo findById(int idCapitulo) {
+        return getCapituloById(idCapitulo);
     }
 
     @Transactional
-    public CapituloResponseDto create(CapituloRequestDto request) {
-        if (StringUtils.isBlank(request.getNombreCapitulo())) {
-            throw new IllegalArgumentException("El nombre del capítulo no puede estar vacío");
-        }
-        if (request.getNumeroCapitulo() <= 0) {
-            throw new IllegalArgumentException("El número del capítulo debe ser positivo");
-        }
-        if (StringUtils.isBlank(request.getEnlace())) {
-            throw new IllegalArgumentException("El enlace del capítulo no puede estar vacío");
-        }
-
+    public Capitulo create(CapituloRequestDto request) {
         Temporada temporada = validarTemporadaExiste(request.getIdTemporada());
 
-        Capitulo capitulo = Capitulo.builder()
-                .temporada(temporada)
-                .nombreCapitulo(request.getNombreCapitulo())
-                .numeroCapitulo(request.getNumeroCapitulo())
-                .enlace(request.getEnlace())
-                .descripcion(request.getDescripcion())
-                .build();
+        Capitulo capitulo = Capitulo.crear(
+                temporada,
+                request.getNombreCapitulo(),
+                request.getNumeroCapitulo(),
+                request.getEnlace(),
+                request.getDescripcion());
 
-        return toResponse(capituloRepository.save(capitulo));
+        return capituloRepository.save(capitulo);
     }
 
     @Transactional
-    public CapituloResponseDto update(int idCapitulo, CapituloRequestDto request) {
+    public Capitulo update(int idCapitulo, CapituloRequestDto request) {
         Capitulo capitulo = getCapituloById(idCapitulo);
+        capitulo.actualizarDatos(
+                request.getNombreCapitulo(),
+                request.getNumeroCapitulo(),
+                request.getEnlace(),
+                request.getDescripcion());
 
-        if (StringUtils.isNotBlank(request.getNombreCapitulo())) {
-            capitulo.setNombreCapitulo(request.getNombreCapitulo());
-        }
-        if (request.getNumeroCapitulo() > 0) {
-            capitulo.setNumeroCapitulo(request.getNumeroCapitulo());
-        }
-        if (StringUtils.isNotBlank(request.getEnlace())) {
-            capitulo.setEnlace(request.getEnlace());
-        }
-        if (StringUtils.isNotBlank(request.getDescripcion())) {
-            capitulo.setDescripcion(request.getDescripcion());
-        }
-
-        return toResponse(capituloRepository.save(capitulo));
+        return capituloRepository.save(capitulo);
     }
 
     @Transactional
@@ -98,26 +72,13 @@ public class CapituloService {
 
     private Capitulo getCapituloById(int idCapitulo) {
         return capituloRepository.findById(idCapitulo)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe el capítulo con id " + idCapitulo));
     }
 
     private Temporada validarTemporadaExiste(int idTemporada) {
         return temporadaRepository.findById(idTemporada)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe la temporada con id " + idTemporada));
-    }
-
-    private CapituloResponseDto toResponse(Capitulo capitulo) {
-        return new CapituloResponseDto(
-                capitulo.getIdCapitulo(),
-                capitulo.getTemporada().getIdTemporada(),
-                capitulo.getNombreCapitulo(),
-                capitulo.getNumeroCapitulo(),
-                capitulo.getEnlace(),
-                capitulo.getDescripcion()
-        );
     }
 }
