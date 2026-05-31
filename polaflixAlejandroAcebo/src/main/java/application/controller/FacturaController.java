@@ -2,15 +2,17 @@ package application.controller;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import application.model.dto.factura.FacturaResponseDto;
+import application.model.entity.facturacion.Factura;
+import application.model.view.Views;
 import application.service.FacturaService;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping("/facturas")
@@ -24,17 +26,20 @@ public class FacturaController {
     }
 
     @GetMapping
-    public List<FacturaResponseDto> getFacturas() {
+    @JsonView(Views.Summary.class)
+    public List<Factura> getFacturas() {
         return facturaService.findAll();
     }
 
     @GetMapping("/{id}")
-    public FacturaResponseDto getFacturaById(@PathVariable int id) {
+    @JsonView(Views.Detail.class)
+    public Factura getFacturaById(@PathVariable("id") @Positive int id) {
         return facturaService.findById(id);
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public List<FacturaResponseDto> getFacturasByUsuario(@PathVariable int usuarioId) {
+    @JsonView(Views.Detail.class)
+    public List<Factura> getFacturasByUsuario(@PathVariable("usuarioId") @Positive int usuarioId) {
         return facturaService.findByUsuarioId(usuarioId);
     }
 }

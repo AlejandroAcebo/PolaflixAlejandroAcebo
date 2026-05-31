@@ -5,7 +5,9 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
+import application.model.view.Views;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,14 +31,17 @@ public class Temporada {
 
     @Id
     @GeneratedValue
+    @JsonView(Views.Summary.class)
     private int idTemporada;
     
     @ManyToOne
     @JsonIgnore
     private Serie serie;
     
+    @JsonView(Views.Summary.class)
     private String nombreTemporada;
     
+    @JsonView(Views.Summary.class)
     private int numeroTemporada;
     
     @OneToMany(mappedBy = "temporada", cascade = CascadeType.ALL)
@@ -52,21 +57,9 @@ public class Temporada {
     }
 
     @JsonProperty("idSerie")
+    @JsonView(Views.Summary.class)
     public int getIdSerie() {
         return serie == null ? 0 : serie.getIdSerie();
-    }
-
-    public void actualizarDatos(String nombreTemporada, int numeroTemporada) {
-        if (tieneTexto(nombreTemporada)) {
-            this.nombreTemporada = nombreTemporada;
-        }
-        if (numeroTemporada > 0) {
-            this.numeroTemporada = numeroTemporada;
-        }
-    }
-
-    private boolean tieneTexto(String value) {
-        return value != null && !value.isBlank();
     }
 
     @Override

@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import application.exception.ResourceNotFoundException;
-import application.model.dto.visualizacion.VisualizacionRequestDto;
 import application.model.entity.serie.Capitulo;
 import application.model.entity.seguimientoserie.Visualizacion;
 import application.model.entity.seguimientoserie.SeguimientoSerie;
 import application.model.entity.usuario.Usuario;
+import application.model.request.VisualizacionRequest;
 import application.repository.CapituloRepository;
 import application.repository.SeguimientoSerieRepository;
 import application.repository.UsuarioRepository;
@@ -45,7 +45,7 @@ public class VisualizacionService {
     }
 
     @Transactional
-    public Visualizacion create(int usuarioId, VisualizacionRequestDto request) {
+    public Visualizacion create(int usuarioId, VisualizacionRequest request) {
         Usuario usuario = validarUsuarioExiste(usuarioId);
         Capitulo capitulo = validarCapituloExiste(request.getIdCapitulo());
         int serieId = capitulo.getTemporada().getSerie().getIdSerie();

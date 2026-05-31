@@ -3,6 +3,7 @@ package application.controller;
 import java.net.URI;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import application.model.dto.visualizacion.VisualizacionRequestDto;
-import application.model.dto.visualizacion.VisualizacionResponseDto;
+import application.model.entity.seguimientoserie.Visualizacion;
+import application.model.request.VisualizacionRequest;
+import application.model.view.Views;
 import application.service.VisualizacionService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping("/usuarios/{usuarioId}/visualizaciones")
@@ -30,30 +33,33 @@ public class VisualizacionController {
     }
 
     @GetMapping
-    public List<VisualizacionResponseDto> getVisualizaciones(@PathVariable int usuarioId) {
+    @JsonView(Views.Summary.class)
+    public List<Visualizacion> getVisualizaciones(@PathVariable("usuarioId") @Positive int usuarioId) {
         return visualizacionService.findByUsuarioId(usuarioId);
     }
 
     @GetMapping("/{id}")
-    public VisualizacionResponseDto getVisualizacionById(
-            @PathVariable int usuarioId,
-            @PathVariable int id) {
+    @JsonView(Views.Detail.class)
+    public Visualizacion getVisualizacionById(
+            @PathVariable("usuarioId") @Positive int usuarioId,
+            @PathVariable("id") @Positive int id) {
         return visualizacionService.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<VisualizacionResponseDto> createVisualizacion(
-            @PathVariable int usuarioId,
-            @Valid @RequestBody VisualizacionRequestDto request) {
-        VisualizacionResponseDto createdVisualizacion = visualizacionService.create(usuarioId, request);
+    @JsonView(Views.Detail.class)
+    public ResponseEntity<Visualizacion> createVisualizacion(
+            @PathVariable("usuarioId") @Positive int usuarioId,
+            @Valid @RequestBody VisualizacionRequest request) {
+        Visualizacion createdVisualizacion = visualizacionService.create(usuarioId, request);
         return ResponseEntity.created(URI.create("/usuarios/" + usuarioId + "/visualizaciones/" + createdVisualizacion.getIdVisualizacion())).body(createdVisualizacion);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVisualizacion(
-            @PathVariable int usuarioId,
-            @PathVariable int id) {
+            @PathVariable("usuarioId") @Positive int usuarioId,
+            @PathVariable("id") @Positive int id) {
         visualizacionService.delete(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

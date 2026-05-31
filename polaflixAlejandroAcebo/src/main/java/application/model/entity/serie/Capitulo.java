@@ -3,7 +3,9 @@ package application.model.entity.serie;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
+import application.model.view.Views;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -26,14 +28,19 @@ public class Capitulo {
 
     @Id
     @GeneratedValue
+    @JsonView(Views.Summary.class)
     private int idCapitulo;
     
+    @JsonView(Views.Summary.class)
     private String nombreCapitulo;
     
+    @JsonView(Views.Summary.class)
     private int numeroCapitulo;
     
+    @JsonView(Views.Summary.class)
     private String enlace;
     
+    @JsonView(Views.Summary.class)
     private String descripcion;
     
     @ManyToOne
@@ -57,6 +64,7 @@ public class Capitulo {
     }
 
     @JsonProperty("idTemporada")
+    @JsonView(Views.Summary.class)
     public int getIdTemporada() {
         return temporada == null ? 0 : temporada.getIdTemporada();
     }
@@ -83,29 +91,6 @@ public class Capitulo {
         return comparacionTemporada != 0
                 ? comparacionTemporada
                 : Integer.compare(numeroCapitulo, otro.numeroCapitulo);
-    }
-
-    public void actualizarDatos(
-            String nombreCapitulo,
-            int numeroCapitulo,
-            String enlace,
-            String descripcion) {
-        if (tieneTexto(nombreCapitulo)) {
-            this.nombreCapitulo = nombreCapitulo;
-        }
-        if (numeroCapitulo > 0) {
-            this.numeroCapitulo = numeroCapitulo;
-        }
-        if (tieneTexto(enlace)) {
-            this.enlace = enlace;
-        }
-        if (tieneTexto(descripcion)) {
-            this.descripcion = descripcion;
-        }
-    }
-
-    private boolean tieneTexto(String value) {
-        return value != null && !value.isBlank();
     }
 
     @Override

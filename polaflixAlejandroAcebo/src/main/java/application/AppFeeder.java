@@ -102,7 +102,7 @@ public class AppFeeder implements CommandLineRunner {
                 .build();
 
         List<Visualizacion> visualizaciones = crearVisualizaciones(alejandro, mario, series);
-        List<SeguimientoSerie> seguimientos = crearSeguimientos(alejandro, mario, series, visualizaciones);
+        List<SeguimientoSerie> seguimientos = crearSeguimientos(alejandro, mario, series);
         List<Factura> facturasAlejandro = crearFacturasAlejandro(alejandro);
         List<Factura> facturasMario = crearFacturasMario(mario, series);
 
@@ -555,10 +555,66 @@ public class AppFeeder implements CommandLineRunner {
                 "The Rooster Prince",
                 "A Muddy Road");
 
+        Serie barry = crearSerieCatalogo(
+                "Barry",
+                "Un sicario que quiere ser actor intenta escapar de su vida criminal.",
+                TipoSerie.SILVER,
+                personas.get(4),
+                personas.get(5),
+                "barry",
+                "Chapter One",
+                "Use It",
+                "Make the Unsafe Choice");
+
+        Serie mindhunter = crearSerieCatalogo(
+                "Mindhunter",
+                "Agentes del FBI estudian asesinos en serie para comprender nuevos patrones criminales.",
+                TipoSerie.GOLD,
+                personas.get(0),
+                personas.get(1),
+                "mindhunter",
+                "Episode 1",
+                "Episode 2",
+                "Episode 3");
+
+        Serie houseOfTheDragon = crearSerieCatalogo(
+                "House of the Dragon",
+                "La casa Targaryen se fractura en una guerra de sucesion por el trono.",
+                TipoSerie.GOLD,
+                personas.get(18),
+                personas.get(19),
+                "houseofthedragon",
+                "The Heirs of the Dragon",
+                "The Rogue Prince",
+                "Second of His Name");
+
+        Serie loki = crearSerieCatalogo(
+                "Loki",
+                "El dios del engano queda atrapado en una organizacion que vigila el tiempo.",
+                TipoSerie.SILVER,
+                personas.get(14),
+                personas.get(15),
+                "loki",
+                "Glorious Purpose",
+                "The Variant",
+                "Lamentis");
+
+        Serie silo = crearSerieCatalogo(
+                "Silo",
+                "Una comunidad subterranea descubre grietas en la verdad que sostiene su mundo.",
+                TipoSerie.ESTANDAR,
+                personas.get(12),
+                personas.get(13),
+                "silo",
+                "Freedom Day",
+                "Holston's Pick",
+                "Machines");
+
         return List.of(breakingBad, theCrown, friends, inception, greysAnatomy, dark,
                 strangerThings, mandalorian, laCasaDePapel, theLastOfUs, arcane, severance,
                 theBear, chernobyl, betterCallSaul, blackMirror, andor, succession,
-                theOffice, peakyBlinders, westworld, fargo);
+                theOffice, peakyBlinders, westworld, fargo, barry, mindhunter,
+                houseOfTheDragon, loki, silo);
     }
 
     private Serie crearSerieCatalogo(
@@ -629,9 +685,8 @@ public class AppFeeder implements CommandLineRunner {
         Visualizacion v29 = visualizacion(alejandro, capitulo(series, 20, 1), 2026, 5, 17);
         Visualizacion v30 = visualizacion(alejandro, capitulo(series, 21, 0), 2026, 5, 22);
 
-        return List.of(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10,
-                v11, v12, v13, v14, v15, v16, v17, v18, v19, v20,
-                v21, v22, v23, v24, v25, v26, v27, v28, v29, v30);
+        return List.of(v1, v2, v3, v4, v5, v6, v7, v8, v9,
+                v13, v14, v22, v23, v25, v26, v28, v29);
     }
 
     private Visualizacion visualizacion(Usuario usuario, Capitulo capitulo, int anio, int mes, int dia) {
@@ -649,23 +704,22 @@ public class AppFeeder implements CommandLineRunner {
     private List<SeguimientoSerie> crearSeguimientos(
             Usuario alejandro,
             Usuario mario,
-            List<Serie> series,
-            List<Visualizacion> visualizaciones) {
+            List<Serie> series) {
         SeguimientoSerie s1 = SeguimientoSerie.builder()
                 .serie(series.get(0))
-                .ultimoVisto(visualizaciones.get(1).getCapitulo())
+                .ultimoVisto(capitulo(series, 0, 1))
                 .usuario(alejandro)
                 .estadoSerie(EstadoSerie.EMPEZADA)
                 .build();
         SeguimientoSerie s2 = SeguimientoSerie.builder()
                 .serie(series.get(1))
-                .ultimoVisto(visualizaciones.get(2).getCapitulo())
+                .ultimoVisto(capitulo(series, 1, 0))
                 .usuario(alejandro)
                 .estadoSerie(EstadoSerie.TERMINADA)
                 .build();
         SeguimientoSerie s3 = SeguimientoSerie.builder()
                 .serie(series.get(3))
-                .ultimoVisto(visualizaciones.get(3).getCapitulo())
+                .ultimoVisto(capitulo(series, 3, 0))
                 .usuario(alejandro)
                 .estadoSerie(EstadoSerie.TERMINADA)
                 .build();
@@ -677,13 +731,13 @@ public class AppFeeder implements CommandLineRunner {
                 .build();
         SeguimientoSerie s5 = SeguimientoSerie.builder()
                 .serie(series.get(5))
-                .ultimoVisto(visualizaciones.get(5).getCapitulo())
+                .ultimoVisto(capitulo(series, 5, 1))
                 .usuario(alejandro)
                 .estadoSerie(EstadoSerie.TERMINADA)
                 .build();
         SeguimientoSerie s6 = SeguimientoSerie.builder()
                 .serie(series.get(2))
-                .ultimoVisto(visualizaciones.get(7).getCapitulo())
+                .ultimoVisto(capitulo(series, 2, 1))
                 .usuario(mario)
                 .estadoSerie(EstadoSerie.TERMINADA)
                 .build();
@@ -694,36 +748,23 @@ public class AppFeeder implements CommandLineRunner {
                 .estadoSerie(EstadoSerie.PENDIENTE)
                 .build();
 
-        SeguimientoSerie s8 = seguimiento(alejandro, series.get(6), visualizaciones.get(8), EstadoSerie.TERMINADA);
-        SeguimientoSerie s9 = seguimiento(alejandro, series.get(7), visualizaciones.get(9), EstadoSerie.TERMINADA);
-        SeguimientoSerie s10 = seguimiento(alejandro, series.get(8), visualizaciones.get(10), EstadoSerie.TERMINADA);
-        SeguimientoSerie s11 = seguimiento(alejandro, series.get(9), visualizaciones.get(11), EstadoSerie.TERMINADA);
-        SeguimientoSerie s12 = seguimiento(alejandro, series.get(10), visualizaciones.get(13), EstadoSerie.EMPEZADA);
-        SeguimientoSerie s13 = seguimiento(alejandro, series.get(11), visualizaciones.get(15), EstadoSerie.EMPEZADA);
-        SeguimientoSerie s14 = seguimiento(alejandro, series.get(12), visualizaciones.get(16), EstadoSerie.EMPEZADA);
-        SeguimientoSerie s15 = seguimiento(alejandro, series.get(13), visualizaciones.get(18), EstadoSerie.EMPEZADA);
-        SeguimientoSerie s16 = seguimiento(alejandro, series.get(14), visualizaciones.get(19), EstadoSerie.EMPEZADA);
-        SeguimientoSerie s17 = seguimiento(alejandro, series.get(15), visualizaciones.get(20), EstadoSerie.EMPEZADA);
-        SeguimientoSerie s18 = seguimiento(alejandro, series.get(16), visualizaciones.get(22), EstadoSerie.EMPEZADA);
-        SeguimientoSerie s19 = seguimiento(alejandro, series.get(17), visualizaciones.get(23), EstadoSerie.EMPEZADA);
-        SeguimientoSerie s20 = seguimiento(alejandro, series.get(18), visualizaciones.get(25), EstadoSerie.EMPEZADA);
-        SeguimientoSerie s21 = seguimiento(alejandro, series.get(19), visualizaciones.get(26), EstadoSerie.EMPEZADA);
-        SeguimientoSerie s22 = seguimiento(alejandro, series.get(20), visualizaciones.get(28), EstadoSerie.EMPEZADA);
-        SeguimientoSerie s23 = seguimiento(alejandro, series.get(21), visualizaciones.get(29), EstadoSerie.EMPEZADA);
+        SeguimientoSerie s8 = seguimiento(alejandro, series.get(6), capitulo(series, 6, 0), EstadoSerie.EMPEZADA);
+        SeguimientoSerie s12 = seguimiento(alejandro, series.get(10), capitulo(series, 10, 1), EstadoSerie.EMPEZADA);
+        SeguimientoSerie s18 = seguimiento(alejandro, series.get(16), capitulo(series, 16, 1), EstadoSerie.EMPEZADA);
+        SeguimientoSerie s20 = seguimiento(alejandro, series.get(18), capitulo(series, 18, 1), EstadoSerie.EMPEZADA);
+        SeguimientoSerie s22 = seguimiento(alejandro, series.get(20), capitulo(series, 20, 1), EstadoSerie.EMPEZADA);
 
-        return List.of(s1, s2, s3, s4, s5, s6, s7, s8, s9, s10,
-                s11, s12, s13, s14, s15, s16, s17, s18, s19, s20,
-                s21, s22, s23);
+        return List.of(s1, s2, s3, s4, s5, s6, s7, s8, s12, s18, s20, s22);
     }
 
     private SeguimientoSerie seguimiento(
             Usuario usuario,
             Serie serie,
-            Visualizacion ultimaVisualizacion,
+            Capitulo ultimoVisto,
             EstadoSerie estadoSerie) {
         return SeguimientoSerie.builder()
                 .serie(serie)
-                .ultimoVisto(ultimaVisualizacion.getCapitulo())
+                .ultimoVisto(ultimoVisto)
                 .usuario(usuario)
                 .estadoSerie(estadoSerie)
                 .build();

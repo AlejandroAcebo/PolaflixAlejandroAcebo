@@ -11,18 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import application.exception.BadRequestException;
 import application.exception.ResourceNotFoundException;
-import application.model.dto.serie.SerieResponseDto;
-import application.model.dto.view.CapituloDetalleResponseDto;
-import application.model.dto.view.CargoFacturaResponseDto;
-import application.model.dto.view.CatalogoResponseDto;
-import application.model.dto.view.FacturaMensualResponseDto;
-import application.model.dto.view.SeguimientoResumenResponseDto;
-import application.model.dto.view.SerieCatalogoResponseDto;
-import application.model.dto.view.SerieDetalleResponseDto;
-import application.model.dto.view.SeriePersonalResponseDto;
-import application.model.dto.view.TemporadaDetalleResponseDto;
-import application.model.dto.view.UsuarioHomeResponseDto;
-import application.model.dto.view.UsuarioResumenResponseDto;
 import application.model.entity.persona.Persona;
 import application.model.entity.seguimientoserie.SeguimientoSerie;
 import application.model.entity.seguimientoserie.Visualizacion;
@@ -35,6 +23,18 @@ import application.repository.SeguimientoSerieRepository;
 import application.repository.SerieRepository;
 import application.repository.UsuarioRepository;
 import application.repository.VisualizacionRepository;
+import application.model.view.CapituloDetalleView;
+import application.model.view.CargoFacturaView;
+import application.model.view.CatalogoView;
+import application.model.view.FacturaMensualView;
+import application.model.view.SeguimientoResumenView;
+import application.model.view.SerieCatalogoView;
+import application.model.view.SerieDetalleView;
+import application.model.view.SeriePersonalView;
+import application.model.view.SerieView;
+import application.model.view.TemporadaDetalleView;
+import application.model.view.UsuarioHomeView;
+import application.model.view.UsuarioResumenView;
 
 @Service
 public class PantallaUsuarioService {
@@ -56,7 +56,7 @@ public class PantallaUsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public UsuarioHomeResponseDto getHome(int usuarioId) {
+    public UsuarioHomeView getHome(int usuarioId) {
         Usuario usuario = getUsuario(usuarioId);
         List<Visualizacion> visualizaciones = visualizacionRepository.findByUsuarioIdUsuario(usuarioId);
 
@@ -65,12 +65,12 @@ public class PantallaUsuarioService {
                         Visualizacion::idSerie,
                         Collectors.mapping(Visualizacion::idCapitulo, Collectors.toSet())));
 
-        List<SeriePersonalResponseDto> series = seguimientoSerieRepository.findByUsuarioIdUsuario(usuarioId).stream()
+        List<SeriePersonalView> series = seguimientoSerieRepository.findByUsuarioIdUsuario(usuarioId).stream()
                 .map(seguimiento -> toSeriePersonal(seguimiento, vistosPorSerie))
-                .sorted(Comparator.comparing(SeriePersonalResponseDto::getNombreSerie))
+                .sorted(Comparator.comparing(SeriePersonalView::nombreSerie))
                 .toList();
 
-        return new UsuarioHomeResponseDto(
+        return new UsuarioHomeView(
                 toUsuarioResumen(usuario),
                 filtrarPorEstado(series, EstadoSerie.EMPEZADA),
                 filtrarPorEstado(series, EstadoSerie.PENDIENTE),
@@ -78,7 +78,7 @@ public class PantallaUsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public SerieDetalleResponseDto getSerieDetalle(int usuarioId, int serieId) {
+    public SerieDetalleView getSerieDetalle(int usuarioId, int serieId) {
         getUsuario(usuarioId);
         SeguimientoSerie seguimiento = seguimientoSerieRepository.findByUsuarioIdUsuarioAndSerieIdSerie(usuarioId, serieId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -89,18 +89,18 @@ public class PantallaUsuarioService {
                 .map(Visualizacion::idCapitulo)
                 .collect(Collectors.toSet());
 
-        List<TemporadaDetalleResponseDto> temporadas = serie.getTemporadas().stream()
+        List<TemporadaDetalleView> temporadas = serie.getTemporadas().stream()
                 .sorted(Comparator.comparingInt(Temporada::getNumeroTemporada))
                 .map(temporada -> toTemporadaDetalle(temporada, capitulosVistos))
                 .toList();
 
         int totalCapitulos = serie.totalCapitulos();
         int vistos = (int) temporadas.stream()
-                .flatMap(temporada -> temporada.getCapitulos().stream())
-                .filter(CapituloDetalleResponseDto::isVisto)
+                .flatMap(temporada -> temporada.capitulos().stream())
+                .filter(CapituloDetalleView::visto)
                 .count();
 
-        return new SerieDetalleResponseDto(
+        return new SerieDetalleView(
                 toSerieResponse(serie),
                 toSeguimientoResumen(seguimiento),
                 temporadas,
@@ -110,24 +110,24 @@ public class PantallaUsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public CatalogoResponseDto getCatalogo(int usuarioId, String inicial) {
+    public CatalogoView getCatalogo(int usuarioId, String inicial) {
         getUsuario(usuarioId);
         String inicialNormalizada = Serie.normalizarInicialCatalogo(inicial);
         Set<Integer> seriesAgregadas = seguimientoSerieRepository.findByUsuarioIdUsuario(usuarioId).stream()
                 .map(seguimiento -> seguimiento.getSerie().getIdSerie())
                 .collect(Collectors.toSet());
 
-        List<SerieCatalogoResponseDto> series = serieRepository.findAll().stream()
+        List<SerieCatalogoView> series = serieRepository.findAll().stream()
                 .filter(serie -> serie.inicialCatalogo().equals(inicialNormalizada))
                 .sorted(Comparator.comparing(Serie::getNombreSerie))
                 .map(serie -> toSerieCatalogo(serie, seriesAgregadas.contains(serie.getIdSerie())))
                 .toList();
 
-        return new CatalogoResponseDto(inicialNormalizada, series);
+        return new CatalogoView(inicialNormalizada, series);
     }
 
     @Transactional(readOnly = true)
-    public SerieCatalogoResponseDto buscarSerieCatalogo(int usuarioId, String nombre) {
+    public SerieCatalogoView buscarSerieCatalogo(int usuarioId, String nombre) {
         getUsuario(usuarioId);
         String busqueda = nombre == null ? "" : nombre.trim().toLowerCase();
         if (busqueda.isBlank()) {
@@ -148,7 +148,7 @@ public class PantallaUsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public FacturaMensualResponseDto getFacturaMensual(int usuarioId, int anio, int mes) {
+    public FacturaMensualView getFacturaMensual(int usuarioId, int anio, int mes) {
         Usuario usuario = getUsuario(usuarioId);
         boolean cuotaFija = usuario.tieneCuotaFija();
 
@@ -157,13 +157,13 @@ public class PantallaUsuarioService {
                 .sorted(Comparator.comparing(Visualizacion::getFechaVisualizacion))
                 .toList();
 
-        List<CargoFacturaResponseDto> cargos = visualizacionesMes.stream()
+        List<CargoFacturaView> cargos = visualizacionesMes.stream()
                 .map(this::toCargoFactura)
                 .toList();
 
         double total = usuario.calcularTotalFacturaMensual(visualizacionesMes);
 
-        return new FacturaMensualResponseDto(anio, mes, cuotaFija, cargos, total);
+        return new FacturaMensualView(anio, mes, cuotaFija, cargos, total);
     }
 
     private Usuario getUsuario(int usuarioId) {
@@ -172,19 +172,19 @@ public class PantallaUsuarioService {
                         "No existe el usuario con id " + usuarioId));
     }
 
-    private List<SeriePersonalResponseDto> filtrarPorEstado(
-            List<SeriePersonalResponseDto> series,
+    private List<SeriePersonalView> filtrarPorEstado(
+            List<SeriePersonalView> series,
             EstadoSerie estado) {
         return series.stream()
-                .filter(serie -> estado.name().equals(serie.getSeguimiento().getEstadoSerie()))
+                .filter(serie -> estado.name().equals(serie.seguimiento().estadoSerie()))
                 .toList();
     }
 
-    private SeriePersonalResponseDto toSeriePersonal(SeguimientoSerie seguimiento, Map<Integer, Set<Integer>> vistosPorSerie) {
+    private SeriePersonalView toSeriePersonal(SeguimientoSerie seguimiento, Map<Integer, Set<Integer>> vistosPorSerie) {
         Serie serie = seguimiento.getSerie();
         int totalCapitulos = serie.totalCapitulos();
         int capitulosVistos = vistosPorSerie.getOrDefault(serie.getIdSerie(), Set.of()).size();
-        return new SeriePersonalResponseDto(
+        return new SeriePersonalView(
                 serie.getIdSerie(),
                 serie.getNombreSerie(),
                 serie.getSinopsis(),
@@ -196,10 +196,10 @@ public class PantallaUsuarioService {
                 capitulosVistos);
     }
 
-    private TemporadaDetalleResponseDto toTemporadaDetalle(Temporada temporada, Set<Integer> capitulosVistos) {
-        List<CapituloDetalleResponseDto> capitulos = temporada.getCapitulos().stream()
+    private TemporadaDetalleView toTemporadaDetalle(Temporada temporada, Set<Integer> capitulosVistos) {
+        List<CapituloDetalleView> capitulos = temporada.getCapitulos().stream()
                 .sorted(Comparator.comparingInt(Capitulo::getNumeroCapitulo))
-                .map(capitulo -> new CapituloDetalleResponseDto(
+                .map(capitulo -> new CapituloDetalleView(
                         capitulo.getIdCapitulo(),
                         temporada.getIdTemporada(),
                         capitulo.getNombreCapitulo(),
@@ -209,7 +209,7 @@ public class PantallaUsuarioService {
                         capitulosVistos.contains(capitulo.getIdCapitulo())))
                 .toList();
 
-        return new TemporadaDetalleResponseDto(
+        return new TemporadaDetalleView(
                 temporada.getIdTemporada(),
                 temporada.getSerie().getIdSerie(),
                 temporada.getNombreTemporada(),
@@ -219,22 +219,22 @@ public class PantallaUsuarioService {
 
     private int getTemporadaInicial(
             SeguimientoSerie seguimiento,
-            List<TemporadaDetalleResponseDto> temporadas) {
+            List<TemporadaDetalleView> temporadas) {
         Integer idTemporada = seguimiento.idTemporadaUltimoVistoSiEmpezada();
         if (idTemporada == null) {
             return 0;
         }
 
         for (int index = 0; index < temporadas.size(); index++) {
-            if (temporadas.get(index).getIdTemporada() == idTemporada) {
+            if (temporadas.get(index).idTemporada() == idTemporada) {
                 return index;
             }
         }
         return 0;
     }
 
-    private SerieCatalogoResponseDto toSerieCatalogo(Serie serie, boolean agregada) {
-        return new SerieCatalogoResponseDto(
+    private SerieCatalogoView toSerieCatalogo(Serie serie, boolean agregada) {
+        return new SerieCatalogoView(
                 serie.getIdSerie(),
                 serie.getNombreSerie(),
                 serie.getSinopsis(),
@@ -244,35 +244,35 @@ public class PantallaUsuarioService {
                 agregada);
     }
 
-    private UsuarioResumenResponseDto toUsuarioResumen(Usuario usuario) {
-        return new UsuarioResumenResponseDto(
+    private UsuarioResumenView toUsuarioResumen(Usuario usuario) {
+        return new UsuarioResumenView(
                 usuario.getIdUsuario(),
                 usuario.getNombre(),
                 usuario.getPlan().getIdPlan(),
                 usuario.getCargos() == null ? List.of() : usuario.getCargos().stream().map(Enum::name).toList());
     }
 
-    private SeguimientoResumenResponseDto toSeguimientoResumen(SeguimientoSerie seguimiento) {
+    private SeguimientoResumenView toSeguimientoResumen(SeguimientoSerie seguimiento) {
         return toSeguimientoResumen(seguimiento, seguimiento.getEstadoSerie());
     }
 
-    private SeguimientoResumenResponseDto toSeguimientoResumen(SeguimientoSerie seguimiento, EstadoSerie estadoSerie) {
-        return new SeguimientoResumenResponseDto(
+    private SeguimientoResumenView toSeguimientoResumen(SeguimientoSerie seguimiento, EstadoSerie estadoSerie) {
+        return new SeguimientoResumenView(
                 seguimiento.getIdSeguimientoSerie(),
                 estadoSerie == null ? "SIN_ESTADO" : estadoSerie.name(),
                 seguimiento.getUltimoVisto() == null ? null : seguimiento.getUltimoVisto().getIdCapitulo());
     }
 
-    private SerieResponseDto toSerieResponse(Serie serie) {
-        return new SerieResponseDto(
+    private SerieView toSerieResponse(Serie serie) {
+        return new SerieView(
                 serie.getIdSerie(),
                 serie.getNombreSerie(),
                 serie.getSinopsis(),
                 tipoSerie(serie));
     }
 
-    private CargoFacturaResponseDto toCargoFactura(Visualizacion visualizacion) {
-        return new CargoFacturaResponseDto(
+    private CargoFacturaView toCargoFactura(Visualizacion visualizacion) {
+        return new CargoFacturaView(
                 visualizacion.getFechaVisualizacion().toString(),
                 visualizacion.nombreSerie(),
                 visualizacion.episodio(),

@@ -7,10 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import application.exception.ResourceConflictException;
 import application.exception.ResourceNotFoundException;
-import application.model.dto.usuario.UsuarioRequestDto;
-import application.model.dto.usuario.UsuarioUpdateDto;
 import application.model.entity.usuario.Plan;
 import application.model.entity.usuario.Usuario;
+import application.model.request.UsuarioRequest;
+import application.model.request.UsuarioUpdateRequest;
 import application.repository.PlanRepository;
 import application.repository.UsuarioRepository;
 
@@ -36,7 +36,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario create(UsuarioRequestDto request) {
+    public Usuario create(UsuarioRequest request) {
         Plan plan = getPlanById(request.getIdPlan());
         String nombre = request.getNombre().trim();
         validarNombreDisponible(nombre);
@@ -52,7 +52,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario update(int idUsuario, UsuarioUpdateDto request) {
+    public Usuario update(int idUsuario, UsuarioUpdateRequest request) {
         Usuario usuario = getUsuarioById(idUsuario);
 
         if(tieneTexto(request.getNombre())) {

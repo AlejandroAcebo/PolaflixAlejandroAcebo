@@ -1,7 +1,9 @@
 package application.model.entity.persona;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
+import application.model.view.Views;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -22,8 +24,10 @@ public class Persona {
 
     @Id
     @GeneratedValue
+    @JsonView(Views.Summary.class)
     private int idPersona;
     
+    @JsonView(Views.Summary.class)
     private String nombrePersona;
 
     @Override

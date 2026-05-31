@@ -2,7 +2,9 @@ package application.model.entity.usuario;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
+import application.model.view.Views;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
@@ -26,8 +28,10 @@ import lombok.Setter;
 public abstract class Plan {
 
     @Id
+    @JsonView(Views.Summary.class)
     private int idPlan;
     
+    @JsonView(Views.Summary.class)
     protected double precio;
     
     public abstract double calcularCoste();
@@ -35,6 +39,7 @@ public abstract class Plan {
     public abstract boolean esCuotaFija();
 
     @JsonProperty("tipoPlan")
+    @JsonView(Views.Summary.class)
     public String getTipoPlan() {
         return getClass().getSimpleName();
     }

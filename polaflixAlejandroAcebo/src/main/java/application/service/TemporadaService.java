@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import application.exception.ResourceNotFoundException;
-import application.model.dto.temporada.TemporadaRequestDto;
 import application.model.entity.serie.Serie;
 import application.model.entity.serie.Temporada;
 import application.repository.SerieRepository;
@@ -23,11 +22,6 @@ public class TemporadaService {
     }
 
     @Transactional(readOnly = true)
-    public List<Temporada> findAll() {
-        return temporadaRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
     public List<Temporada> findBySerieId(int serieId) {
         validarSerieExiste(serieId);
         return temporadaRepository.findBySerieIdSerie(serieId);
@@ -36,32 +30,6 @@ public class TemporadaService {
     @Transactional(readOnly = true)
     public Temporada findById(int idTemporada) {
         return getTemporadaById(idTemporada);
-    }
-
-    @Transactional
-    public Temporada create(TemporadaRequestDto request) {
-        Serie serie = validarSerieExiste(request.getIdSerie());
-
-        Temporada temporada = Temporada.crear(
-                serie,
-                request.getNombreTemporada(),
-                request.getNumeroTemporada());
-
-        return temporadaRepository.save(temporada);
-    }
-
-    @Transactional
-    public Temporada update(int idTemporada, TemporadaRequestDto request) {
-        Temporada temporada = getTemporadaById(idTemporada);
-        temporada.actualizarDatos(request.getNombreTemporada(), request.getNumeroTemporada());
-
-        return temporadaRepository.save(temporada);
-    }
-
-    @Transactional
-    public void delete(int idTemporada) {
-        Temporada temporada = getTemporadaById(idTemporada);
-        temporadaRepository.delete(temporada);
     }
 
     private Temporada getTemporadaById(int idTemporada) {

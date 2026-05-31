@@ -5,7 +5,9 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import application.model.entity.usuario.Usuario;
+import application.model.view.Views;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,8 +32,10 @@ public class Factura {
 
     @Id
     @GeneratedValue
+    @JsonView(Views.Summary.class)
     private int idFactura;
     
+    @JsonView(Views.Summary.class)
     private LocalDate fecha;
     
     @ManyToOne
@@ -39,6 +43,7 @@ public class Factura {
     @JsonIgnore
     private Usuario usuario;
 
+    @JsonView(Views.Summary.class)
     public double getTotal() {
         return cargos == null ? 0 : cargos.stream()
         .mapToDouble(Cargo::getPrecio)
@@ -46,12 +51,13 @@ public class Factura {
     }
 
     @JsonProperty("idUsuario")
+    @JsonView(Views.Summary.class)
     public int getIdUsuario() {
         return usuario == null ? 0 : usuario.getIdUsuario();
     }
     
     @ElementCollection(fetch = FetchType.EAGER)
-    @JsonIgnore
+    @JsonView(Views.Detail.class)
     private List<Cargo> cargos;
 
     @Override

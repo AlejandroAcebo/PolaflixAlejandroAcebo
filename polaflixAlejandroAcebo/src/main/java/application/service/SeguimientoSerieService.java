@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import application.exception.ResourceNotFoundException;
-import application.model.dto.seguimientoserie.SeguimientoSerieRequestDto;
 import application.model.entity.serie.Serie;
 import application.model.entity.seguimientoserie.SeguimientoSerie;
 import application.model.entity.usuario.Usuario;
+import application.model.request.SeguimientoSerieRequest;
 import application.repository.SerieRepository;
 import application.repository.SeguimientoSerieRepository;
 import application.repository.UsuarioRepository;
@@ -41,7 +41,7 @@ public class SeguimientoSerieService {
     }
 
     @Transactional
-    public SeguimientoSerie create(int usuarioId, SeguimientoSerieRequestDto request) {
+    public SeguimientoSerie create(int usuarioId, SeguimientoSerieRequest request) {
         Usuario usuario = validarUsuarioExiste(usuarioId);
         Serie serie = validarSerieExiste(request.getIdSerie());
 

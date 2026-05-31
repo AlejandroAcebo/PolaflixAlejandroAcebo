@@ -5,11 +5,13 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import application.model.entity.serie.Capitulo;
 import application.model.entity.serie.Serie;
 import application.model.entity.usuario.Usuario;
 import application.model.enums.EstadoSerie;
+import application.model.view.Views;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -40,6 +42,7 @@ public class SeguimientoSerie {
 
     @Id
     @GeneratedValue
+    @JsonView(Views.Summary.class)
     private int idSeguimientoSerie;
     
     @ManyToOne
@@ -58,14 +61,17 @@ public class SeguimientoSerie {
     private Usuario usuario;
     
     @Enumerated(EnumType.STRING)
+    @JsonView(Views.Summary.class)
     private EstadoSerie estadoSerie;
 
     @JsonProperty("idSerie")
+    @JsonView(Views.Summary.class)
     public int getIdSerie() {
         return serie == null ? 0 : serie.getIdSerie();
     }
 
     @JsonProperty("idCapituloUltimoVisto")
+    @JsonView(Views.Summary.class)
     public Integer getIdCapituloUltimoVisto() {
         return ultimoVisto == null ? null : ultimoVisto.getIdCapitulo();
     }

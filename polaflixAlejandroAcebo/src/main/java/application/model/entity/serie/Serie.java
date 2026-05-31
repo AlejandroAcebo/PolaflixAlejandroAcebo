@@ -6,9 +6,11 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import application.model.entity.persona.Persona;
 import application.model.enums.TipoSerie;
+import application.model.view.Views;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,13 +38,17 @@ public class Serie {
 
     @Id
     @GeneratedValue
+    @JsonView(Views.Summary.class)
     private int idSerie;
     
+    @JsonView(Views.Summary.class)
     private String nombreSerie;
     
+    @JsonView(Views.Summary.class)
     private String sinopsis;
     
     @Enumerated(EnumType.STRING)
+    @JsonView(Views.Summary.class)
     private TipoSerie tipoSerie;
     
     @OneToMany(mappedBy="serie",cascade = CascadeType.ALL)
@@ -53,14 +59,14 @@ public class Serie {
     @JoinTable(name = "creadores_series",
             joinColumns = @JoinColumn(name = "idSerie"),
             inverseJoinColumns = @JoinColumn(name = "idPersona"))
-    @JsonIgnore
+    @JsonView(Views.Detail.class)
     private List<Persona> creadores;
     
     @ManyToMany
     @JoinTable(name = "actores_series",
             joinColumns = @JoinColumn(name = "idSerie"),
             inverseJoinColumns = @JoinColumn(name = "idPersona"))
-    @JsonIgnore
+    @JsonView(Views.Detail.class)
     private List<Persona> actores;
 
     public static Serie crear(String nombreSerie, String sinopsis, TipoSerie tipoSerie) {
@@ -110,18 +116,6 @@ public class Serie {
             return "A";
         }
         return inicialNormalizada(inicial);
-    }
-
-    public void actualizarDatos(String nombreSerie, String sinopsis, TipoSerie tipoSerie) {
-        if (tieneTexto(nombreSerie)) {
-            this.nombreSerie = nombreSerie;
-        }
-        if (tieneTexto(sinopsis)) {
-            this.sinopsis = sinopsis;
-        }
-        if (tipoSerie != null) {
-            this.tipoSerie = tipoSerie;
-        }
     }
 
     private List<Capitulo> capitulos() {

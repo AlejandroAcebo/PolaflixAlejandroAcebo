@@ -1,23 +1,19 @@
 package application.controller;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import application.model.dto.serie.SerieRequestDto;
-import application.model.dto.serie.SerieResponseDto;
+import application.model.entity.serie.Serie;
+import application.model.view.Views;
 import application.service.SerieService;
-import jakarta.validation.Valid;
+import application.service.UsuarioService;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping("/series")
@@ -25,36 +21,30 @@ import jakarta.validation.Valid;
 public class SerieController {
 
     private final SerieService serieService;
+    private final UsuarioService usuarioService;
 
-    public SerieController(SerieService serieService) {
+    public SerieController(SerieService serieService, UsuarioService usuarioService) {
         this.serieService = serieService;
+        this.usuarioService = usuarioService;
     }
 
     @GetMapping
-    public List<SerieResponseDto> getSeries() {
+    @JsonView(Views.Summary.class)
+    public List<Serie> getSeries() {
+        return serieService.findAll();
+    }
+
+    @GetMapping("/usuario/{usuarioId}")
+    @JsonView(Views.Summary.class)
+    public List<Serie> getSeriesPorUsuario(@PathVariable("usuarioId") @Positive int usuarioId) {
+        usuarioService.findById(usuarioId);
         return serieService.findAll();
     }
 
     @GetMapping("/{id}")
-    public SerieResponseDto getSerieById(@PathVariable int id) {
+    @JsonView(Views.Detail.class)
+    public Serie getSerieById(@PathVariable("id") @Positive int id) {
         return serieService.findById(id);
     }
 
-    @PostMapping
-    public ResponseEntity<SerieResponseDto> createSerie(@Valid @RequestBody SerieRequestDto request) {
-        SerieResponseDto createdSerie = serieService.create(request);
-        return ResponseEntity.created(URI.create("/series/" + createdSerie.getIdSerie())).body(createdSerie);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<SerieResponseDto> updateSerie(@PathVariable int id, @Valid @RequestBody SerieRequestDto request) {
-        SerieResponseDto updatedSerie = serieService.update(id, request);
-        return ResponseEntity.ok(updatedSerie);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSerie(@PathVariable int id) {
-        serieService.delete(id);
-        return ResponseEntity.ok().build();
-    }
 }

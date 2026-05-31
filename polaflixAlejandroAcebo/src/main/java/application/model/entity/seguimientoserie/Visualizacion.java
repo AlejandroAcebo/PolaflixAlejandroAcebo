@@ -4,11 +4,13 @@ import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import application.model.entity.serie.Capitulo;
 import application.model.entity.serie.Serie;
 import application.model.entity.serie.Temporada;
 import application.model.entity.usuario.Usuario;
+import application.model.view.Views;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -32,8 +34,10 @@ public class Visualizacion {
     
     @Id
     @GeneratedValue
+    @JsonView(Views.Summary.class)
     private Integer idVisualizacion;
     
+    @JsonView(Views.Summary.class)
     private LocalDate fechaVisualizacion;
     
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,11 +51,13 @@ public class Visualizacion {
     private Capitulo capitulo;
 
     @JsonProperty("idUsuario")
+    @JsonView(Views.Summary.class)
     public int getIdUsuario() {
         return usuario == null ? 0 : usuario.getIdUsuario();
     }
 
     @JsonProperty("idCapitulo")
+    @JsonView(Views.Summary.class)
     public int getIdCapitulo() {
         return capitulo == null ? 0 : capitulo.getIdCapitulo();
     }

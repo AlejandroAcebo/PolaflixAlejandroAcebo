@@ -3,6 +3,7 @@ package application.controller;
 import java.net.URI;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import application.model.dto.seguimientoserie.SeguimientoSerieRequestDto;
-import application.model.dto.seguimientoserie.SeguimientoSerieResponseDto;
+import application.model.entity.seguimientoserie.SeguimientoSerie;
+import application.model.request.SeguimientoSerieRequest;
+import application.model.view.Views;
 import application.service.SeguimientoSerieService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping("/usuarios/{usuarioId}/seguimientos")
@@ -30,38 +33,41 @@ public class SeguimientoSerieController {
     }
 
     @GetMapping
-    public List<SeguimientoSerieResponseDto> getSeguimientos(@PathVariable int usuarioId) {
+    @JsonView(Views.Summary.class)
+    public List<SeguimientoSerie> getSeguimientos(@PathVariable("usuarioId") @Positive int usuarioId) {
         return seguimientoSerieService.findByUsuarioId(usuarioId);
     }
 
     @GetMapping("/{id}")
-    public SeguimientoSerieResponseDto getSeguimientoById(
-            @PathVariable int usuarioId,
-            @PathVariable int id) {
+    @JsonView(Views.Detail.class)
+    public SeguimientoSerie getSeguimientoById(
+            @PathVariable("usuarioId") @Positive int usuarioId,
+            @PathVariable("id") @Positive int id) {
         return seguimientoSerieService.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<SeguimientoSerieResponseDto> createSeguimiento(
-            @PathVariable int usuarioId,
-            @Valid @RequestBody SeguimientoSerieRequestDto request) {
-        SeguimientoSerieResponseDto createdSeguimiento = seguimientoSerieService.create(usuarioId, request);
+    @JsonView(Views.Detail.class)
+    public ResponseEntity<SeguimientoSerie> createSeguimiento(
+            @PathVariable("usuarioId") @Positive int usuarioId,
+            @Valid @RequestBody SeguimientoSerieRequest request) {
+        SeguimientoSerie createdSeguimiento = seguimientoSerieService.create(usuarioId, request);
         return ResponseEntity.created(URI.create("/usuarios/" + usuarioId + "/seguimientos/" + createdSeguimiento.getIdSeguimientoSerie())).body(createdSeguimiento);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSeguimiento(
-            @PathVariable int usuarioId,
-            @PathVariable int id) {
+            @PathVariable("usuarioId") @Positive int usuarioId,
+            @PathVariable("id") @Positive int id) {
         seguimientoSerieService.delete(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/series/{serieId}")
     public ResponseEntity<Void> deleteSeguimientoBySerie(
-            @PathVariable int usuarioId,
-            @PathVariable int serieId) {
+            @PathVariable("usuarioId") @Positive int usuarioId,
+            @PathVariable("serieId") @Positive int serieId) {
         seguimientoSerieService.deleteBySerie(usuarioId, serieId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

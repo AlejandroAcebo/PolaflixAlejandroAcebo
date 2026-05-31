@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import application.model.entity.facturacion.Factura;
 import application.model.entity.seguimientoserie.SeguimientoSerie;
@@ -18,6 +19,7 @@ import application.model.entity.serie.Capitulo;
 import application.model.entity.serie.Serie;
 import application.model.enums.CargoRol;
 import application.model.enums.EstadoSerie;
+import application.model.view.Views;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -50,9 +52,11 @@ public class Usuario {
 
     @Id
     @GeneratedValue
+    @JsonView(Views.Summary.class)
     private int idUsuario;
     
     @Column(nullable = false, unique = true)
+    @JsonView(Views.Summary.class)
     private String nombre;
 
     @Column(nullable = false)
@@ -60,6 +64,7 @@ public class Usuario {
     private String contrasena;
     
     @Pattern(regexp = "^[A-Z]{2}\\d{2}[A-Z0-9]{11,30}$", message = "Debe tener formato IBAN")
+    @JsonView(Views.Detail.class)
     private String cuentaBancaria;
     
     @ManyToOne
@@ -70,6 +75,7 @@ public class Usuario {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "usuario_cargos", joinColumns = @JoinColumn(name = "id_usuario"))
     @Enumerated(EnumType.STRING)
+    @JsonView(Views.Summary.class)
     private List<CargoRol> cargos;
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -89,6 +95,7 @@ public class Usuario {
     private Map<Serie, List<Visualizacion>> visualizaciones;
 
     @JsonProperty("idPlan")
+    @JsonView(Views.Summary.class)
     public Integer getIdPlan() {
         return plan == null ? null : plan.getIdPlan();
     }

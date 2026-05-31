@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import application.exception.ResourceNotFoundException;
-import application.model.dto.capitulo.CapituloRequestDto;
 import application.model.entity.serie.Capitulo;
 import application.model.entity.serie.Temporada;
 import application.repository.CapituloRepository;
@@ -23,11 +22,6 @@ public class CapituloService {
     }
 
     @Transactional(readOnly = true)
-    public List<Capitulo> findAll() {
-        return capituloRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
     public List<Capitulo> findByTemporadaId(int temporadaId) {
         validarTemporadaExiste(temporadaId);
         return capituloRepository.findByTemporadaIdTemporada(temporadaId);
@@ -36,38 +30,6 @@ public class CapituloService {
     @Transactional(readOnly = true)
     public Capitulo findById(int idCapitulo) {
         return getCapituloById(idCapitulo);
-    }
-
-    @Transactional
-    public Capitulo create(CapituloRequestDto request) {
-        Temporada temporada = validarTemporadaExiste(request.getIdTemporada());
-
-        Capitulo capitulo = Capitulo.crear(
-                temporada,
-                request.getNombreCapitulo(),
-                request.getNumeroCapitulo(),
-                request.getEnlace(),
-                request.getDescripcion());
-
-        return capituloRepository.save(capitulo);
-    }
-
-    @Transactional
-    public Capitulo update(int idCapitulo, CapituloRequestDto request) {
-        Capitulo capitulo = getCapituloById(idCapitulo);
-        capitulo.actualizarDatos(
-                request.getNombreCapitulo(),
-                request.getNumeroCapitulo(),
-                request.getEnlace(),
-                request.getDescripcion());
-
-        return capituloRepository.save(capitulo);
-    }
-
-    @Transactional
-    public void delete(int idCapitulo) {
-        Capitulo capitulo = getCapituloById(idCapitulo);
-        capituloRepository.delete(capitulo);
     }
 
     private Capitulo getCapituloById(int idCapitulo) {
