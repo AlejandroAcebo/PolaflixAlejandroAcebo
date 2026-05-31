@@ -1,0 +1,26 @@
+<header class="app-header">
+  <a class="brand" routerLink="/usuario" aria-label="Ir al inicio de Polaflix">
+    <span class="brand-icon" aria-hidden="true">
+      <span></span>
+    </span>
+    <span>Polaflix</span>
+  </a>
+
+  <h1>Bienvenido {{ userName }}</h1>
+
+  <span class="avatar" aria-label="Usuario activo">
+    {{ userInitial }}
+  </span>
+</header>
+
+<nav class="nav page" aria-label="Navegacion principal">
+  <a routerLink="/usuario" routerLinkActive="active">Inicio</a>
+  <span>|</span>
+  <a routerLink="/catalogo" routerLinkActive="active">Agregar Serie</a>
+  <span>|</span>
+  <a routerLink="/facturas" routerLinkActive="active">Ver Cargos</a>
+</nav>
+
+<main class="content">
+  <router-outlet></router-outlet>
+</main>

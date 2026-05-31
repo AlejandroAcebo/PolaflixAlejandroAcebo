@@ -1,0 +1,46 @@
+<section class="page">
+  <ng-container *ngIf="state$ | async as state">
+    <app-loading-state *ngIf="state.status === 'loading'" message="Cargando espacio personal..."></app-loading-state>
+
+    <app-error-alert *ngIf="state.status === 'error'" [message]="state.message"></app-error-alert>
+
+    <ng-container *ngIf="state.status === 'success'">
+      <section class="personal-summary">
+        <div class="summary-copy">
+          <span class="eyebrow">Mi espacio</span>
+          <h2>{{ state.view.usuario.nombre }}</h2>
+          <p>Plan {{ state.view.usuario.idPlan === 1 ? 'cuota fija mensual' : 'pago por capítulo' }}</p>
+        </div>
+
+        <div class="summary-stats" aria-label="Resumen del usuario">
+          <article>
+            <strong>{{ totalSeries(state.view) }}</strong>
+            <span>series</span>
+          </article>
+          <article>
+            <strong>{{ totalCapitulosVistos(state.view) }}</strong>
+            <span>vistos</span>
+          </article>
+          <article>
+            <strong>{{ state.view.pendientes.length }}</strong>
+            <span>pendientes</span>
+          </article>
+        </div>
+      </section>
+
+      <ul class="role-list" aria-label="Cargos del usuario">
+        <li *ngFor="let cargo of state.view.usuario.cargos">{{ cargo }}</li>
+      </ul>
+
+      <div class="lists-grid">
+        <app-personal-list title="Empezadas" [items]="state.view.empezadas"></app-personal-list>
+        <app-personal-list title="Pendientes" [items]="state.view.pendientes"></app-personal-list>
+        <app-personal-list
+          title="Terminadas"
+          [items]="state.view.terminadas"
+          [showProgress]="false"
+        ></app-personal-list>
+      </div>
+    </ng-container>
+  </ng-container>
+</section>

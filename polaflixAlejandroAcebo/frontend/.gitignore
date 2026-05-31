@@ -1,0 +1,30 @@
+# Dependencias
+node_modules/
+
+# Builds y cache de Angular
+dist/
+.angular/
+
+# Tests y cobertura
+coverage/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Variables locales
+.env
+.env.*
+!.env.example
+
+# Archivos temporales del sistema/editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Configuracion local de IDEs
+.idea/
+.vscode/

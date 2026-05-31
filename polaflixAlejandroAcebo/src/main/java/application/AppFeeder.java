@@ -718,30 +718,17 @@ public class AppFeeder implements CommandLineRunner {
         Visualizacion v13 = visualizacion(mario, friendsEpisode1, 2026, 3, 8);
         Visualizacion v14 = visualizacion(mario, friendsEpisode2, 2026, 3, 9);
         Visualizacion v15 = visualizacion(alejandro, capitulo(series, 6, 0), 2026, 3, 16);
-        Visualizacion v16 = visualizacion(alejandro, capitulo(series, 7, 0), 2026, 3, 18);
-        Visualizacion v17 = visualizacion(alejandro, capitulo(series, 8, 0), 2026, 3, 22);
-        Visualizacion v18 = visualizacion(alejandro, capitulo(series, 9, 0), 2026, 3, 25);
         Visualizacion v19 = visualizacion(alejandro, capitulo(series, 10, 0), 2026, 4, 2);
         Visualizacion v20 = visualizacion(alejandro, capitulo(series, 10, 1), 2026, 4, 3);
-        Visualizacion v21 = visualizacion(alejandro, capitulo(series, 11, 0), 2026, 4, 5);
-        Visualizacion v22 = visualizacion(alejandro, capitulo(series, 11, 1), 2026, 4, 6);
-        Visualizacion v23 = visualizacion(alejandro, capitulo(series, 12, 0), 2026, 4, 9);
-        Visualizacion v24 = visualizacion(alejandro, capitulo(series, 13, 0), 2026, 4, 12);
-        Visualizacion v25 = visualizacion(alejandro, capitulo(series, 13, 1), 2026, 4, 13);
-        Visualizacion v26 = visualizacion(alejandro, capitulo(series, 14, 0), 2026, 4, 17);
-        Visualizacion v27 = visualizacion(alejandro, capitulo(series, 15, 0), 2026, 4, 21);
         Visualizacion v28 = visualizacion(alejandro, capitulo(series, 16, 0), 2026, 5, 1);
         Visualizacion v29 = visualizacion(alejandro, capitulo(series, 16, 1), 2026, 5, 2);
-        Visualizacion v30 = visualizacion(alejandro, capitulo(series, 17, 0), 2026, 5, 5);
         Visualizacion v31 = visualizacion(alejandro, capitulo(series, 18, 0), 2026, 5, 8);
         Visualizacion v32 = visualizacion(alejandro, capitulo(series, 18, 1), 2026, 5, 9);
-        Visualizacion v33 = visualizacion(alejandro, capitulo(series, 19, 0), 2026, 5, 13);
         Visualizacion v34 = visualizacion(alejandro, capitulo(series, 20, 0), 2026, 5, 16);
         Visualizacion v35 = visualizacion(alejandro, capitulo(series, 20, 1), 2026, 5, 17);
-        Visualizacion v36 = visualizacion(alejandro, capitulo(series, 21, 0), 2026, 5, 22);
 
         return List.of(v1, v2, v3, v4, v5, v6, v7, v8, v9,
-                v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36);
+                v10, v11, v12, v13, v14, v15, v19, v20, v28, v29, v31, v32, v34, v35);
     }
 
     private Visualizacion visualizacion(Usuario usuario, Capitulo capitulo, int anio, int mes, int dia) {
@@ -804,7 +791,7 @@ public class AppFeeder implements CommandLineRunner {
                 .estadoSerie(EstadoSerie.PENDIENTE)
                 .build();
 
-        SeguimientoSerie s8 = seguimiento(alejandro, series.get(6), capitulo(series, 6, 0), EstadoSerie.EMPEZADA);
+        SeguimientoSerie s8 = seguimiento(alejandro, series.get(6), capitulo(series, 6, 0), EstadoSerie.TERMINADA);
         SeguimientoSerie s12 = seguimiento(alejandro, series.get(10), capitulo(series, 10, 1), EstadoSerie.EMPEZADA);
         SeguimientoSerie s18 = seguimiento(alejandro, series.get(16), capitulo(series, 16, 1), EstadoSerie.EMPEZADA);
         SeguimientoSerie s20 = seguimiento(alejandro, series.get(18), capitulo(series, 18, 1), EstadoSerie.EMPEZADA);
