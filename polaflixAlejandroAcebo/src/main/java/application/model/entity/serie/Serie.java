@@ -106,9 +106,13 @@ public class Serie {
     }
 
     public boolean coincideConBusqueda(String busqueda) {
-        return tieneTexto(busqueda)
-                && nombreSerie != null
-                && nombreSerie.toLowerCase().contains(busqueda.trim().toLowerCase());
+        if (!tieneTexto(busqueda) || !tieneTexto(nombreSerie)) {
+            return false;
+        }
+
+        String busquedaNormalizada = busqueda.trim().toLowerCase();
+        return List.of(nombreSerie.toLowerCase().split("\\s+")).stream()
+                .anyMatch(palabra -> palabra.startsWith(busquedaNormalizada));
     }
 
     public static String normalizarInicialCatalogo(String inicial) {

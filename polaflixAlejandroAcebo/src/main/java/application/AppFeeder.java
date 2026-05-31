@@ -190,7 +190,14 @@ public class AppFeeder implements CommandLineRunner {
                 .enlace("https://polaflix.local/breakingbad/t1/e2")
                 .descripcion("Walter y Jesse intentan encubrir sus primeros errores.")
                 .build();
-        bbT1.setCapitulos(new ArrayList<>(List.of(bbT1C1, bbT1C2)));
+        Capitulo bbT1C3 = Capitulo.builder()
+                .temporada(bbT1)
+                .nombreCapitulo("And the Bag's in the River")
+                .numeroCapitulo(3)
+                .enlace("https://polaflix.local/breakingbad/t1/e3")
+                .descripcion("Las consecuencias de sus actos se ciernen sobre ellos.")
+                .build();
+        bbT1.setCapitulos(new ArrayList<>(List.of(bbT1C1, bbT1C2, bbT1C3)));
 
         Temporada bbT2 = Temporada.builder()
                 .serie(breakingBad)
@@ -204,8 +211,44 @@ public class AppFeeder implements CommandLineRunner {
                 .enlace("https://polaflix.local/breakingbad/t2/e1")
                 .descripcion("El peligro alrededor del negocio aumenta.")
                 .build();
-        bbT2.setCapitulos(new ArrayList<>(List.of(bbT2C1)));
-        breakingBad.setTemporadas(new ArrayList<>(List.of(bbT1, bbT2)));
+        Capitulo bbT2C2 = Capitulo.builder()
+                .temporada(bbT2)
+                .nombreCapitulo("Grilled")
+                .numeroCapitulo(2)
+                .enlace("https://polaflix.local/breakingbad/t2/e2")
+                .descripcion("Walter y Jesse enfrentan sus enemigos.")
+                .build();
+        bbT2.setCapitulos(new ArrayList<>(List.of(bbT2C1, bbT2C2)));
+
+        Temporada bbT3 = Temporada.builder()
+                .serie(breakingBad)
+                .nombreTemporada("Temporada 3")
+                .numeroTemporada(3)
+                .build();
+        Capitulo bbT3C1 = Capitulo.builder()
+                .temporada(bbT3)
+                .nombreCapitulo("No Mas")
+                .numeroCapitulo(1)
+                .enlace("https://polaflix.local/breakingbad/t3/e1")
+                .descripcion("El imperio se expande.")
+                .build();
+        Capitulo bbT3C2 = Capitulo.builder()
+                .temporada(bbT3)
+                .nombreCapitulo("One Minute")
+                .numeroCapitulo(2)
+                .enlace("https://polaflix.local/breakingbad/t3/e2")
+                .descripcion("Las tensiones llegan a su punto maximo.")
+                .build();
+        Capitulo bbT3C3 = Capitulo.builder()
+                .temporada(bbT3)
+                .nombreCapitulo("Salud")
+                .numeroCapitulo(3)
+                .enlace("https://polaflix.local/breakingbad/t3/e3")
+                .descripcion("El final definitivo se aproxima.")
+                .build();
+        bbT3.setCapitulos(new ArrayList<>(List.of(bbT3C1, bbT3C2, bbT3C3)));
+        
+        breakingBad.setTemporadas(new ArrayList<>(List.of(bbT1, bbT2, bbT3)));
 
         Serie theCrown = Serie.builder()
                 .nombreSerie("The Crown")
@@ -645,8 +688,14 @@ public class AppFeeder implements CommandLineRunner {
     }
 
     private List<Visualizacion> crearVisualizaciones(Usuario alejandro, Usuario mario, List<Serie> series) {
-        Capitulo bbPilot = series.get(0).getTemporadas().get(0).getCapitulos().get(0);
-        Capitulo bbEpisode2 = series.get(0).getTemporadas().get(0).getCapitulos().get(1);
+        Capitulo bbT1C1 = series.get(0).getTemporadas().get(0).getCapitulos().get(0);
+        Capitulo bbT1C2 = series.get(0).getTemporadas().get(0).getCapitulos().get(1);
+        Capitulo bbT1C3 = series.get(0).getTemporadas().get(0).getCapitulos().get(2);
+        Capitulo bbT2C1 = series.get(0).getTemporadas().get(1).getCapitulos().get(0);
+        Capitulo bbT2C2 = series.get(0).getTemporadas().get(1).getCapitulos().get(1);
+        Capitulo bbT3C1 = series.get(0).getTemporadas().get(2).getCapitulos().get(0);
+        Capitulo bbT3C2 = series.get(0).getTemporadas().get(2).getCapitulos().get(1);
+        Capitulo bbT3C3 = series.get(0).getTemporadas().get(2).getCapitulos().get(2);
         Capitulo crownEpisode1 = series.get(1).getTemporadas().get(0).getCapitulos().get(0);
         Capitulo friendsEpisode1 = series.get(2).getTemporadas().get(0).getCapitulos().get(0);
         Capitulo friendsEpisode2 = series.get(2).getTemporadas().get(0).getCapitulos().get(1);
@@ -654,39 +703,45 @@ public class AppFeeder implements CommandLineRunner {
         Capitulo darkEpisode1 = series.get(5).getTemporadas().get(0).getCapitulos().get(0);
         Capitulo darkEpisode2 = series.get(5).getTemporadas().get(0).getCapitulos().get(1);
 
-        Visualizacion v1 = visualizacion(alejandro, bbPilot, 2026, 3, 3);
-        Visualizacion v2 = visualizacion(alejandro, bbEpisode2, 2026, 3, 4);
-        Visualizacion v3 = visualizacion(alejandro, crownEpisode1, 2026, 3, 6);
-        Visualizacion v4 = visualizacion(alejandro, inceptionEpisode1, 2026, 3, 10);
-        Visualizacion v5 = visualizacion(alejandro, darkEpisode1, 2026, 3, 12);
-        Visualizacion v6 = visualizacion(alejandro, darkEpisode2, 2026, 3, 13);
-        Visualizacion v7 = visualizacion(mario, friendsEpisode1, 2026, 3, 8);
-        Visualizacion v8 = visualizacion(mario, friendsEpisode2, 2026, 3, 9);
-        Visualizacion v9 = visualizacion(alejandro, capitulo(series, 6, 0), 2026, 3, 16);
-        Visualizacion v10 = visualizacion(alejandro, capitulo(series, 7, 0), 2026, 3, 18);
-        Visualizacion v11 = visualizacion(alejandro, capitulo(series, 8, 0), 2026, 3, 22);
-        Visualizacion v12 = visualizacion(alejandro, capitulo(series, 9, 0), 2026, 3, 25);
-        Visualizacion v13 = visualizacion(alejandro, capitulo(series, 10, 0), 2026, 4, 2);
-        Visualizacion v14 = visualizacion(alejandro, capitulo(series, 10, 1), 2026, 4, 3);
-        Visualizacion v15 = visualizacion(alejandro, capitulo(series, 11, 0), 2026, 4, 5);
-        Visualizacion v16 = visualizacion(alejandro, capitulo(series, 11, 1), 2026, 4, 6);
-        Visualizacion v17 = visualizacion(alejandro, capitulo(series, 12, 0), 2026, 4, 9);
-        Visualizacion v18 = visualizacion(alejandro, capitulo(series, 13, 0), 2026, 4, 12);
-        Visualizacion v19 = visualizacion(alejandro, capitulo(series, 13, 1), 2026, 4, 13);
-        Visualizacion v20 = visualizacion(alejandro, capitulo(series, 14, 0), 2026, 4, 17);
-        Visualizacion v21 = visualizacion(alejandro, capitulo(series, 15, 0), 2026, 4, 21);
-        Visualizacion v22 = visualizacion(alejandro, capitulo(series, 16, 0), 2026, 5, 1);
-        Visualizacion v23 = visualizacion(alejandro, capitulo(series, 16, 1), 2026, 5, 2);
-        Visualizacion v24 = visualizacion(alejandro, capitulo(series, 17, 0), 2026, 5, 5);
-        Visualizacion v25 = visualizacion(alejandro, capitulo(series, 18, 0), 2026, 5, 8);
-        Visualizacion v26 = visualizacion(alejandro, capitulo(series, 18, 1), 2026, 5, 9);
-        Visualizacion v27 = visualizacion(alejandro, capitulo(series, 19, 0), 2026, 5, 13);
-        Visualizacion v28 = visualizacion(alejandro, capitulo(series, 20, 0), 2026, 5, 16);
-        Visualizacion v29 = visualizacion(alejandro, capitulo(series, 20, 1), 2026, 5, 17);
-        Visualizacion v30 = visualizacion(alejandro, capitulo(series, 21, 0), 2026, 5, 22);
+        Visualizacion v1 = visualizacion(alejandro, bbT1C1, 2026, 3, 3);
+        Visualizacion v2 = visualizacion(alejandro, bbT1C2, 2026, 3, 4);
+        Visualizacion v3 = visualizacion(alejandro, bbT1C3, 2026, 3, 5);
+        Visualizacion v4 = visualizacion(alejandro, bbT2C1, 2026, 3, 8);
+        Visualizacion v5 = visualizacion(alejandro, bbT2C2, 2026, 3, 9);
+        Visualizacion v6 = visualizacion(alejandro, bbT3C1, 2026, 3, 12);
+        Visualizacion v7 = visualizacion(alejandro, bbT3C2, 2026, 3, 13);
+        Visualizacion v8 = visualizacion(alejandro, bbT3C3, 2026, 3, 14);
+        Visualizacion v9 = visualizacion(alejandro, crownEpisode1, 2026, 3, 6);
+        Visualizacion v10 = visualizacion(alejandro, inceptionEpisode1, 2026, 3, 10);
+        Visualizacion v11 = visualizacion(alejandro, darkEpisode1, 2026, 3, 12);
+        Visualizacion v12 = visualizacion(alejandro, darkEpisode2, 2026, 3, 13);
+        Visualizacion v13 = visualizacion(mario, friendsEpisode1, 2026, 3, 8);
+        Visualizacion v14 = visualizacion(mario, friendsEpisode2, 2026, 3, 9);
+        Visualizacion v15 = visualizacion(alejandro, capitulo(series, 6, 0), 2026, 3, 16);
+        Visualizacion v16 = visualizacion(alejandro, capitulo(series, 7, 0), 2026, 3, 18);
+        Visualizacion v17 = visualizacion(alejandro, capitulo(series, 8, 0), 2026, 3, 22);
+        Visualizacion v18 = visualizacion(alejandro, capitulo(series, 9, 0), 2026, 3, 25);
+        Visualizacion v19 = visualizacion(alejandro, capitulo(series, 10, 0), 2026, 4, 2);
+        Visualizacion v20 = visualizacion(alejandro, capitulo(series, 10, 1), 2026, 4, 3);
+        Visualizacion v21 = visualizacion(alejandro, capitulo(series, 11, 0), 2026, 4, 5);
+        Visualizacion v22 = visualizacion(alejandro, capitulo(series, 11, 1), 2026, 4, 6);
+        Visualizacion v23 = visualizacion(alejandro, capitulo(series, 12, 0), 2026, 4, 9);
+        Visualizacion v24 = visualizacion(alejandro, capitulo(series, 13, 0), 2026, 4, 12);
+        Visualizacion v25 = visualizacion(alejandro, capitulo(series, 13, 1), 2026, 4, 13);
+        Visualizacion v26 = visualizacion(alejandro, capitulo(series, 14, 0), 2026, 4, 17);
+        Visualizacion v27 = visualizacion(alejandro, capitulo(series, 15, 0), 2026, 4, 21);
+        Visualizacion v28 = visualizacion(alejandro, capitulo(series, 16, 0), 2026, 5, 1);
+        Visualizacion v29 = visualizacion(alejandro, capitulo(series, 16, 1), 2026, 5, 2);
+        Visualizacion v30 = visualizacion(alejandro, capitulo(series, 17, 0), 2026, 5, 5);
+        Visualizacion v31 = visualizacion(alejandro, capitulo(series, 18, 0), 2026, 5, 8);
+        Visualizacion v32 = visualizacion(alejandro, capitulo(series, 18, 1), 2026, 5, 9);
+        Visualizacion v33 = visualizacion(alejandro, capitulo(series, 19, 0), 2026, 5, 13);
+        Visualizacion v34 = visualizacion(alejandro, capitulo(series, 20, 0), 2026, 5, 16);
+        Visualizacion v35 = visualizacion(alejandro, capitulo(series, 20, 1), 2026, 5, 17);
+        Visualizacion v36 = visualizacion(alejandro, capitulo(series, 21, 0), 2026, 5, 22);
 
         return List.of(v1, v2, v3, v4, v5, v6, v7, v8, v9,
-                v13, v14, v22, v23, v25, v26, v28, v29);
+                v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36);
     }
 
     private Visualizacion visualizacion(Usuario usuario, Capitulo capitulo, int anio, int mes, int dia) {
@@ -705,11 +760,12 @@ public class AppFeeder implements CommandLineRunner {
             Usuario alejandro,
             Usuario mario,
             List<Serie> series) {
+        Capitulo bbLastCapitulo = series.get(0).getTemporadas().get(2).getCapitulos().get(2);
         SeguimientoSerie s1 = SeguimientoSerie.builder()
                 .serie(series.get(0))
-                .ultimoVisto(capitulo(series, 0, 1))
+                .ultimoVisto(bbLastCapitulo)
                 .usuario(alejandro)
-                .estadoSerie(EstadoSerie.EMPEZADA)
+                .estadoSerie(EstadoSerie.TERMINADA)
                 .build();
         SeguimientoSerie s2 = SeguimientoSerie.builder()
                 .serie(series.get(1))

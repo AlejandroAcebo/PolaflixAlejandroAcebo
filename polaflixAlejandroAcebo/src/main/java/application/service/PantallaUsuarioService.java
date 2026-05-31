@@ -154,7 +154,7 @@ public class PantallaUsuarioService {
 
         List<Visualizacion> visualizacionesMes = visualizacionRepository.findByUsuarioIdUsuario(usuarioId).stream()
                 .filter(visualizacion -> visualizacion.perteneceAlMes(anio, mes))
-                .sorted(Comparator.comparing(Visualizacion::getFechaVisualizacion))
+                .sorted(Comparator.comparing(Visualizacion::getFechaVisualizacion).reversed())
                 .toList();
 
         List<CargoFacturaView> cargos = visualizacionesMes.stream()

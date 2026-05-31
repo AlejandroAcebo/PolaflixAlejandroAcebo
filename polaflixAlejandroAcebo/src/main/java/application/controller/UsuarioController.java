@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import application.model.entity.usuario.Usuario;
@@ -69,18 +70,18 @@ public class UsuarioController {
         return pantallaUsuarioService.getSerieDetalle(id, serieId);
     }
 
-    @GetMapping("/{id}/catalogo/{inicial}")
+    @GetMapping("/{id}/catalogo-buscar")
+    public SerieCatalogoView buscarSerieCatalogo(
+            @PathVariable("id") @Positive int id,
+            @RequestParam("nombre") @NotBlank String nombre) {
+        return pantallaUsuarioService.buscarSerieCatalogo(id, nombre);
+    }
+
+    @GetMapping("/{id}/catalogo/{inicial:[A-Za-z0-9]}")
     public CatalogoView getCatalogo(
             @PathVariable("id") @Positive int id,
             @PathVariable("inicial") @NotBlank String inicial) {
         return pantallaUsuarioService.getCatalogo(id, inicial);
-    }
-
-    @GetMapping("/{id}/catalogo/buscar/{nombre}")
-    public SerieCatalogoView buscarSerieCatalogo(
-            @PathVariable("id") @Positive int id,
-            @PathVariable("nombre") @NotBlank String nombre) {
-        return pantallaUsuarioService.buscarSerieCatalogo(id, nombre);
     }
 
     @GetMapping("/{id}/facturas/{anio}/{mes}")
