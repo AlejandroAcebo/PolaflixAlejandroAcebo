@@ -1,0 +1,58 @@
+.month-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  margin: 12px 0 70px;
+}
+
+.month-nav h2 {
+  min-width: 220px;
+  margin: 0;
+  text-align: center;
+  font-size: 1.45rem;
+}
+
+button {
+  border: 0;
+  background: transparent;
+  color: #555555;
+  font-size: 1.6rem;
+}
+
+table {
+  width: min(620px, 100%);
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+th,
+td {
+  padding: 6px 10px;
+  border: 1px solid #999999;
+  text-align: left;
+}
+
+th {
+  text-align: center;
+}
+
+td:last-child {
+  text-align: right;
+}
+
+.total {
+  width: min(620px, 100%);
+  margin: 20px auto 0;
+  text-align: right;
+}
+
+.total span {
+  display: inline-block;
+  margin-right: 24px;
+  padding: 4px 8px;
+  background: #777777;
+  color: #ffffff;
+  font-weight: 700;
+}

@@ -5,21 +5,34 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './rutas-app.module';
 import { AppComponent } from './raiz.component';
-import { apiHeadersInterceptor } from './core/interceptores/interceptor-cabeceras-api';
-import { IntroPageComponent } from './features/inicio-app/paginas/inicio-app/inicio-app.component';
-import { SeriesModule } from './features/series/modulo-series';
-import { UserModule } from './features/usuarios/modulo-usuario';
-import { LayoutModule } from './layout/modulo-estructura';
+import { apiHeadersInterceptor } from './interceptores/interceptor-cabeceras-api';
+import { AvisoErrorComponent } from './compartido/aviso-error/aviso-error.component';
+import { CargandoComponent } from './compartido/cargando/cargando.component';
+import { CatalogoComponent } from './componentes/catalogo/catalogo.component';
+import { DetalleSerieComponent } from './componentes/detalle-serie/detalle-serie.component';
+import { FacturasComponent } from './componentes/facturas/facturas.component';
+import { InicioComponent } from './componentes/inicio/inicio.component';
+import { ListaPersonalComponent } from './componentes/lista-personal/lista-personal.component';
+import { PlantillaComponent } from './componentes/plantilla/plantilla.component';
+import { SinDatosComponent } from './compartido/sin-datos/sin-datos.component';
 
 @NgModule({
-  declarations: [AppComponent, IntroPageComponent],
+  declarations: [
+    AppComponent,
+    AvisoErrorComponent,
+    CargandoComponent,
+    CatalogoComponent,
+    DetalleSerieComponent,
+    FacturasComponent,
+    InicioComponent,
+    ListaPersonalComponent,
+    PlantillaComponent,
+    SinDatosComponent
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    AppRoutingModule,
-    LayoutModule,
-    SeriesModule,
-    UserModule
+    AppRoutingModule
   ],
   providers: [provideHttpClient(withInterceptors([apiHeadersInterceptor]))],
   bootstrap: [AppComponent]

@@ -1,0 +1,4 @@
+.lists-grid {
+  display: grid;
+  gap: 18px;
+}

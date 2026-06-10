@@ -1,13 +1,12 @@
 :root {
-  --color-bg: #f8f9fc;
+  --color-bg: #ffffff;
   --color-panel: #ffffff;
-  --color-text: #1a1f3a;
-  --color-muted: #6b7280;
-  --color-border: #e5e7eb;
-  --color-primary: #ff4757;
-  --color-primary-dark: #c1121f;
-  --color-success: #2ed573;
-  --color-warning: #ffa502;
+  --color-text: #222222;
+  --color-muted: #666666;
+  --color-border: #999999;
+  --color-primary: #006fc9;
+  --color-primary-dark: #004f90;
+  --color-success: #2f7d32;
 }
 
 * {
@@ -24,12 +23,6 @@ body {
 
 a {
   color: var(--color-primary);
-  text-decoration: none;
-}
-
-a:hover {
-  color: var(--color-primary-dark);
-  text-decoration: underline;
 }
 
 button,
@@ -38,37 +31,10 @@ input {
 }
 
 button {
-  border: 0;
   cursor: pointer;
 }
 
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-
 .page {
-  width: min(1120px, calc(100% - 32px));
+  width: min(960px, calc(100% - 32px));
   margin: 0 auto;
-}
-
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 42px;
-  padding: 0 18px;
-  border-radius: 6px;
-  background: var(--color-primary);
-  color: #ffffff;
-  font-weight: 700;
-}
-
-.button.secondary {
-  background: #eef1f6;
-  color: var(--color-text);
-}
-
-.button.success {
-  background: var(--color-success);
 }

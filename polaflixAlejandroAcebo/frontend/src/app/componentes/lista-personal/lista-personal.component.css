@@ -1,0 +1,28 @@
+h2 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+ul {
+  min-height: 78px;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid #999999;
+  list-style: none;
+}
+
+.empezadas ul {
+  background: #eef7ff;
+}
+
+.pendientes ul {
+  background: #fff8df;
+}
+
+.terminadas ul {
+  background: #eef8ee;
+}
+
+li {
+  padding: 1px 0;
+}

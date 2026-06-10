@@ -1,0 +1,65 @@
+<section class="page">
+  <header class="catalog-tools">
+    <nav class="letters" aria-label="Inicial de serie">
+      <button
+        *ngFor="let letter of letters"
+        type="button"
+        [class.active]="(activeLetter$ | async) === letter"
+        (click)="setLetter(letter)"
+      >
+        {{ letter }}
+      </button>
+    </nav>
+
+    <form class="search" (submit)="search(searchInput.value, $event)">
+      <input #searchInput type="search" placeholder="Buscar serie" aria-label="Buscar serie">
+      <button type="submit">Buscar</button>
+    </form>
+  </header>
+
+  <ng-container *ngIf="state$ | async as state">
+    <app-loading-state *ngIf="state.status === 'loading'" message="Cargando series..."></app-loading-state>
+
+    <app-error-alert
+      *ngIf="state.status === 'error'"
+      [message]="state.message"
+    ></app-error-alert>
+
+    <ng-container *ngIf="state.status === 'success'">
+      <app-empty-state
+        *ngIf="state.view.series.length === 0"
+        title="No hay series"
+        text="No hay series para la inicial seleccionada."
+      ></app-empty-state>
+
+      <ul *ngIf="state.view.series.length > 0" class="catalog-list">
+        <li
+          *ngFor="let serie of state.view.series"
+          [class.highlight]="state.view.highlightedSerieId === serie.idSerie"
+        >
+          <div class="serie-row">
+            <button type="button" class="title-button" (click)="toggleSynopsis(serie.idSerie)">
+              {{ serie.nombreSerie }}
+            </button>
+
+            <button
+              type="button"
+              class="add-link"
+              [class.added]="serie.agregada"
+              (click)="addSerie(serie)"
+            >
+              {{ serie.agregada ? 'Agregada' : 'Agregar' }}
+            </button>
+          </div>
+
+          <aside *ngIf="(expandedSerieId$ | async) === serie.idSerie" class="synopsis">
+            <button type="button" aria-label="Cerrar sinopsis" (click)="toggleSynopsis(serie.idSerie)">x</button>
+            <p>{{ serie.sinopsis }}</p>
+            <p><strong>Creador:</strong> {{ serie.creadores.join(', ') || 'No disponible' }}</p>
+            <p><strong>Actores:</strong> {{ serie.actores.join(', ') || 'No disponible' }}</p>
+          </aside>
+        </li>
+      </ul>
+    </ng-container>
+  </ng-container>
+</section>

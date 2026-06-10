@@ -1,0 +1,39 @@
+<section class="page">
+  <ng-container *ngIf="state$ | async as state">
+    <app-loading-state *ngIf="state.status === 'loading'" message="Cargando cargos..."></app-loading-state>
+
+    <app-error-alert *ngIf="state.status === 'error'" [message]="state.message"></app-error-alert>
+
+    <ng-container *ngIf="state.status === 'success'">
+      <header class="month-nav">
+        <button type="button" aria-label="Mes anterior" (click)="cambiarMes(-1)">◀</button>
+        <h2>{{ state.fecha | date: 'MMMM yyyy' }}</h2>
+        <button type="button" aria-label="Mes siguiente" (click)="cambiarMes(1)">▶</button>
+      </header>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Serie</th>
+            <th>Episodio</th>
+            <th>Cargo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cargo of state.factura.cargos">
+            <td>{{ cargo.fecha | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ cargo.nombreSerie }}</td>
+            <td>{{ cargo.episodio }}</td>
+            <td>{{ cargo.precio | currency: 'EUR' }}</td>
+          </tr>
+          <tr *ngIf="state.factura.cargos.length === 0">
+            <td colspan="4">No hay cargos en este mes.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="total"><span>Total</span> {{ state.factura.total | currency: 'EUR' }}</p>
+    </ng-container>
+  </ng-container>
+</section>

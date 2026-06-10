@@ -1,0 +1,15 @@
+<section class="personal-list" [class.empezadas]="title === 'Empezadas'" [class.pendientes]="title === 'Pendientes'" [class.terminadas]="title === 'Terminadas'">
+  <h2>{{ title }}</h2>
+
+  <app-empty-state
+    *ngIf="items.length === 0"
+    title="Sin series"
+    text="No hay series en esta lista."
+  ></app-empty-state>
+
+  <ul *ngIf="items.length > 0">
+    <li *ngFor="let item of items">
+      <a [routerLink]="['/series', item.idSerie]">{{ item.nombreSerie }}</a>
+    </li>
+  </ul>
+</section>

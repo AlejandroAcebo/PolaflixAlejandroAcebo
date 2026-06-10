@@ -1,0 +1,13 @@
+<section class="page">
+  <ng-container *ngIf="state$ | async as state">
+    <app-loading-state *ngIf="state.status === 'loading'" message="Cargando espacio personal..."></app-loading-state>
+
+    <app-error-alert *ngIf="state.status === 'error'" [message]="state.message"></app-error-alert>
+
+    <div *ngIf="state.status === 'success'" class="lists-grid">
+      <app-personal-list title="Empezadas" [items]="state.view.empezadas"></app-personal-list>
+      <app-personal-list title="Pendientes" [items]="state.view.pendientes"></app-personal-list>
+      <app-personal-list title="Terminadas" [items]="state.view.terminadas"></app-personal-list>
+    </div>
+  </ng-container>
+</section>
