@@ -31,6 +31,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapKey;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
@@ -83,8 +84,9 @@ public class Usuario {
     private List<Factura> facturas;
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapKey(name = "serie")
     @JsonIgnore
-    private List<SeguimientoSerie> series; 
+    private Map<Serie, SeguimientoSerie> seguimientos;
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -113,7 +115,7 @@ public class Usuario {
                 .plan(plan)
                 .cargos(cargosPorDefectoSiVacio(cargos))
                 .facturas(new ArrayList<>())
-                .series(new ArrayList<>())
+                .seguimientos(new LinkedHashMap<>())
                 .visualizacionesPersistidas(new ArrayList<>())
                 .visualizaciones(new LinkedHashMap<>())
                 .build();
@@ -146,20 +148,19 @@ public class Usuario {
         if (seriePendiente == null) {
             return null;
         }
-        if (series == null) {
-            series = new ArrayList<>();
+        if (seguimientos == null) {
+            seguimientos = new LinkedHashMap<>();
         }
-        for (SeguimientoSerie s: series) {
-            if(s.getSerie() != null && s.getSerie().getIdSerie() == seriePendiente.getIdSerie()) {
-                return s;
-            }
+        SeguimientoSerie seguimientoExistente = seguimientos.get(seriePendiente);
+        if (seguimientoExistente != null) {
+            return seguimientoExistente;
         }
         SeguimientoSerie seguimientoSerie = SeguimientoSerie.builder()
                 .estadoSerie(EstadoSerie.PENDIENTE)
                 .usuario(this)
                 .serie(seriePendiente)
                 .build();
-        this.series.add(seguimientoSerie);
+        this.seguimientos.put(seriePendiente, seguimientoSerie);
         return seguimientoSerie;
     }
     

@@ -70,7 +70,7 @@ public class AppFeeder implements CommandLineRunner {
                 .plan(planes.get(0))
                 .cargos(new ArrayList<>(List.of(CargoRol.PREMIUM)))
                 .facturas(new ArrayList<>())
-                .series(new ArrayList<>())
+                .seguimientos(new LinkedHashMap<>())
                 .visualizacionesPersistidas(new ArrayList<>())
                 .visualizaciones(new LinkedHashMap<>())
                 .build();
@@ -83,7 +83,7 @@ public class AppFeeder implements CommandLineRunner {
                 .plan(planes.get(0))
                 .cargos(new ArrayList<>(List.of(CargoRol.PREMIUM)))
                 .facturas(new ArrayList<>())
-                .series(new ArrayList<>())
+                .seguimientos(new LinkedHashMap<>())
                 .visualizacionesPersistidas(new ArrayList<>())
                 .visualizaciones(new LinkedHashMap<>())
                 .build();
@@ -96,7 +96,7 @@ public class AppFeeder implements CommandLineRunner {
                 .plan(planes.get(1))
                 .cargos(new ArrayList<>(List.of(CargoRol.USUARIO_ESTANDAR)))
                 .facturas(new ArrayList<>())
-                .series(new ArrayList<>())
+                .seguimientos(new LinkedHashMap<>())
                 .visualizacionesPersistidas(new ArrayList<>())
                 .visualizaciones(new LinkedHashMap<>())
                 .build();
@@ -104,7 +104,7 @@ public class AppFeeder implements CommandLineRunner {
         List<Visualizacion> visualizaciones = crearVisualizaciones(alejandro, mario, series);
         List<SeguimientoSerie> seguimientos = crearSeguimientos(alejandro, mario, series);
         List<Factura> facturasAlejandro = crearFacturasAlejandro(alejandro);
-        List<Factura> facturasMario = crearFacturasMario(mario, series);
+        List<Factura> facturasMario = crearFacturasMario(mario, visualizaciones);
 
         alejandro.setVisualizaciones(crearMapaVisualizacionesUsuario(alejandro, visualizaciones));
         mario.setVisualizaciones(crearMapaVisualizacionesUsuario(mario, visualizaciones));
@@ -114,9 +114,9 @@ public class AppFeeder implements CommandLineRunner {
         mario.setVisualizacionesPersistidas(visualizacionesDe(mario, visualizaciones));
         ana.setVisualizacionesPersistidas(new ArrayList<>());
         
-        alejandro.setSeries(seguimientosDe(alejandro, seguimientos));
-        mario.setSeries(seguimientosDe(mario, seguimientos));
-        ana.setSeries(new ArrayList<>());
+        alejandro.setSeguimientos(seguimientosDe(alejandro, seguimientos));
+        mario.setSeguimientos(seguimientosDe(mario, seguimientos));
+        ana.setSeguimientos(new LinkedHashMap<>());
         
         alejandro.setFacturas(new ArrayList<>(facturasAlejandro));
         mario.setFacturas(new ArrayList<>(facturasMario));
@@ -841,13 +841,13 @@ public class AppFeeder implements CommandLineRunner {
         return visualizacionesUsuario;
     }
 
-    private ArrayList<SeguimientoSerie> seguimientosDe(
+    private Map<Serie, SeguimientoSerie> seguimientosDe(
             Usuario usuario,
             List<SeguimientoSerie> seguimientos) {
-        ArrayList<SeguimientoSerie> seguimientosUsuario = new ArrayList<>();
+        Map<Serie, SeguimientoSerie> seguimientosUsuario = new LinkedHashMap<>();
         for (SeguimientoSerie seguimiento : seguimientos) {
             if (seguimiento.getUsuario() == usuario) {
-                seguimientosUsuario.add(seguimiento);
+                seguimientosUsuario.put(seguimiento.getSerie(), seguimiento);
             }
         }
         return seguimientosUsuario;
@@ -857,52 +857,34 @@ public class AppFeeder implements CommandLineRunner {
         Factura facturaMarzo = Factura.builder()
                 .fecha(LocalDate.of(2026, 3, 31))
                 .usuario(alejandro)
-                .cargos(List.of(
-                        new Cargo(LocalDate.of(2026, 3, 31), 20.0,
-                                "Cuota fija mensual",
-                                0,
-                                0)))
+                .cargos(List.of())
                 .build();
 
         Factura facturaAbril = Factura.builder()
                 .fecha(LocalDate.of(2026, 4, 30))
                 .usuario(alejandro)
-                .cargos(List.of(
-                        new Cargo(LocalDate.of(2026, 4, 30), 20.0,
-                                "Cuota fija mensual",
-                                0,
-                                0)))
+                .cargos(List.of())
                 .build();
 
         Factura facturaMayo = Factura.builder()
                 .fecha(LocalDate.of(2026, 5, 31))
                 .usuario(alejandro)
-                .cargos(List.of(
-                        new Cargo(LocalDate.of(2026, 5, 31), 20.0,
-                                "Cuota fija mensual",
-                                0,
-                                0)))
+                .cargos(List.of())
                 .build();
 
         return List.of(facturaMarzo, facturaAbril, facturaMayo);
    }
 
-    private List<Factura> crearFacturasMario(Usuario mario, List<Serie> series) {
-        Capitulo friendsEpisode1 = series.get(2).getTemporadas().get(0).getCapitulos().get(0);
-        Capitulo friendsEpisode2 = series.get(2).getTemporadas().get(0).getCapitulos().get(1);
+    private List<Factura> crearFacturasMario(Usuario mario, List<Visualizacion> visualizaciones) {
+        List<Cargo> cargosMarzo = visualizacionesDe(mario, visualizaciones).stream()
+                .filter(visualizacion -> visualizacion.perteneceAlMes(2026, 3))
+                .map(Cargo::desdeVisualizacion)
+                .toList();
 
         Factura facturaMarzo = Factura.builder()
                 .fecha(LocalDate.of(2026, 3, 31))
                 .usuario(mario)
-                .cargos(List.of(
-                        new Cargo(LocalDate.of(2026, 3, 8), 0.5,
-                                series.get(2).getNombreSerie(),
-                                friendsEpisode1.getIdCapitulo(),
-                                friendsEpisode1.getTemporada().getNumeroTemporada()),
-                        new Cargo(LocalDate.of(2026, 3, 9), 0.5,
-                                series.get(2).getNombreSerie(),
-                                friendsEpisode2.getIdCapitulo(),
-                                friendsEpisode2.getTemporada().getNumeroTemporada())))
+                .cargos(cargosMarzo)
                 .build();
 
         return List.of(facturaMarzo);

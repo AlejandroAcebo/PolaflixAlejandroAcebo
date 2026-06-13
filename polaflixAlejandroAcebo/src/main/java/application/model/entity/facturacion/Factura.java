@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import application.model.entity.usuario.Usuario;
 import application.model.view.Views;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -45,9 +46,12 @@ public class Factura {
 
     @JsonView(Views.Summary.class)
     public double getTotal() {
+        if (usuario != null && usuario.tieneCuotaFija()) {
+            return usuario.getPlan().calcularCoste();
+        }
         return cargos == null ? 0 : cargos.stream()
-        .mapToDouble(Cargo::getPrecio)
-        .sum(); 
+                .mapToDouble(Cargo::getPrecio)
+                .sum();
     }
 
     @JsonProperty("idUsuario")
@@ -57,6 +61,7 @@ public class Factura {
     }
     
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "cargo", joinColumns = @JoinColumn(name = "idFactura"))
     @JsonView(Views.Detail.class)
     private List<Cargo> cargos;
 

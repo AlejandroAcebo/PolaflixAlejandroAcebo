@@ -77,6 +77,11 @@ public class Visualizacion {
         return capitulo == null ? 0 : capitulo.getIdCapitulo();
     }
 
+    public int idTemporada() {
+        Temporada temporada = temporada();
+        return temporada == null ? 0 : temporada.getIdTemporada();
+    }
+
     public String nombreSerie() {
         Serie serie = serie();
         return serie == null ? "" : serie.getNombreSerie();
