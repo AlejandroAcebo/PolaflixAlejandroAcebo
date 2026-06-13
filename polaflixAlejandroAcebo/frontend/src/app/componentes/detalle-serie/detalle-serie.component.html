@@ -5,12 +5,12 @@
     <app-error-alert *ngIf="state.status === 'error'" [message]="state.message"></app-error-alert>
 
     <ng-container *ngIf="state.status === 'success'">
-      <ng-container *ngIf="temporadaIndex$ | async as temporadaIndex">
+      <ng-container *ngIf="{ index: (temporadaIndex$ | async) ?? 0 } as temporadaState">
         <header class="serie-header">
           <button type="button" (click)="cambiarTemporada(-1, state.view.temporadas.length)">◀</button>
           <h2>
             {{ state.view.serie.nombreSerie }}
-            <span *ngIf="temporadaSeleccionada(state.view.temporadas, temporadaIndex) as temporada">
+            <span *ngIf="temporadaSeleccionada(state.view.temporadas, temporadaState.index) as temporada">
               - {{ temporada.nombreTemporada }}
             </span>
           </h2>
@@ -18,7 +18,7 @@
           <strong>{{ state.view.serie.tipoSerie }}</strong>
         </header>
 
-        <section *ngIf="temporadaSeleccionada(state.view.temporadas, temporadaIndex) as temporada" class="episodes">
+        <section *ngIf="temporadaSeleccionada(state.view.temporadas, temporadaState.index) as temporada" class="episodes">
           <article *ngFor="let capitulo of temporada.capitulos">
             <span>Ep{{ capitulo.numeroCapitulo }}. {{ capitulo.nombreCapitulo }}</span>
             <button type="button" (click)="marcarVisto(capitulo.idCapitulo)">Ver</button>

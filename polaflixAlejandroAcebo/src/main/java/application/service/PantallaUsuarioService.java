@@ -19,10 +19,8 @@ import application.model.entity.serie.Serie;
 import application.model.entity.serie.Temporada;
 import application.model.entity.usuario.Usuario;
 import application.model.enums.EstadoSerie;
-import application.repository.SeguimientoSerieRepository;
 import application.repository.SerieRepository;
 import application.repository.UsuarioRepository;
-import application.repository.VisualizacionRepository;
 import application.model.view.CapituloDetalleView;
 import application.model.view.CargoFacturaView;
 import application.model.view.CatalogoView;
@@ -41,31 +39,25 @@ public class PantallaUsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final SerieRepository serieRepository;
-    private final SeguimientoSerieRepository seguimientoSerieRepository;
-    private final VisualizacionRepository visualizacionRepository;
 
     public PantallaUsuarioService(
             UsuarioRepository usuarioRepository,
-            SerieRepository serieRepository,
-            SeguimientoSerieRepository seguimientoSerieRepository,
-            VisualizacionRepository visualizacionRepository) {
+            SerieRepository serieRepository) {
         this.usuarioRepository = usuarioRepository;
         this.serieRepository = serieRepository;
-        this.seguimientoSerieRepository = seguimientoSerieRepository;
-        this.visualizacionRepository = visualizacionRepository;
     }
 
     @Transactional(readOnly = true)
     public UsuarioHomeView getHome(int usuarioId) {
         Usuario usuario = getUsuario(usuarioId);
-        List<Visualizacion> visualizaciones = visualizacionRepository.findByUsuarioIdUsuario(usuarioId);
+        List<Visualizacion> visualizaciones = usuario.visualizacionesRegistradas();
 
         Map<Integer, Set<Integer>> vistosPorSerie = visualizaciones.stream()
                 .collect(Collectors.groupingBy(
                         Visualizacion::idSerie,
                         Collectors.mapping(Visualizacion::idCapitulo, Collectors.toSet())));
 
-        List<SeriePersonalView> series = seguimientoSerieRepository.findByUsuarioIdUsuario(usuarioId).stream()
+        List<SeriePersonalView> series = usuario.seguimientosRegistrados().stream()
                 .map(seguimiento -> toSeriePersonal(seguimiento, vistosPorSerie))
                 .sorted(Comparator.comparing(SeriePersonalView::nombreSerie))
                 .toList();
@@ -79,13 +71,13 @@ public class PantallaUsuarioService {
 
     @Transactional(readOnly = true)
     public SerieDetalleView getSerieDetalle(int usuarioId, int serieId) {
-        getUsuario(usuarioId);
-        SeguimientoSerie seguimiento = seguimientoSerieRepository.findByUsuarioIdUsuarioAndSerieIdSerie(usuarioId, serieId)
+        Usuario usuario = getUsuario(usuarioId);
+        SeguimientoSerie seguimiento = usuario.seguimientoDeSerie(serieId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "La serie no esta en el espacio personal del usuario"));
         Serie serie = seguimiento.getSerie();
 
-        Set<Integer> capitulosVistos = visualizacionRepository.findByUsuarioIdUsuario(usuarioId).stream()
+        Set<Integer> capitulosVistos = usuario.visualizacionesRegistradas().stream()
                 .map(Visualizacion::idCapitulo)
                 .collect(Collectors.toSet());
 
@@ -111,9 +103,9 @@ public class PantallaUsuarioService {
 
     @Transactional(readOnly = true)
     public CatalogoView getCatalogo(int usuarioId, String inicial) {
-        getUsuario(usuarioId);
+        Usuario usuario = getUsuario(usuarioId);
         String inicialNormalizada = Serie.normalizarInicialCatalogo(inicial);
-        Set<Integer> seriesAgregadas = seguimientoSerieRepository.findByUsuarioIdUsuario(usuarioId).stream()
+        Set<Integer> seriesAgregadas = usuario.seguimientosRegistrados().stream()
                 .map(seguimiento -> seguimiento.getSerie().getIdSerie())
                 .collect(Collectors.toSet());
 
@@ -128,13 +120,13 @@ public class PantallaUsuarioService {
 
     @Transactional(readOnly = true)
     public SerieCatalogoView buscarSerieCatalogo(int usuarioId, String nombre) {
-        getUsuario(usuarioId);
+        Usuario usuario = getUsuario(usuarioId);
         String busqueda = nombre == null ? "" : nombre.trim().toLowerCase();
         if (busqueda.isBlank()) {
             throw new BadRequestException("Debe indicarse un nombre de serie");
         }
 
-        Set<Integer> seriesAgregadas = seguimientoSerieRepository.findByUsuarioIdUsuario(usuarioId).stream()
+        Set<Integer> seriesAgregadas = usuario.seguimientosRegistrados().stream()
                 .map(seguimiento -> seguimiento.getSerie().getIdSerie())
                 .collect(Collectors.toSet());
 
@@ -152,7 +144,7 @@ public class PantallaUsuarioService {
         Usuario usuario = getUsuario(usuarioId);
         boolean cuotaFija = usuario.tieneCuotaFija();
 
-        List<Visualizacion> visualizacionesMes = visualizacionRepository.findByUsuarioIdUsuario(usuarioId).stream()
+        List<Visualizacion> visualizacionesMes = usuario.visualizacionesRegistradas().stream()
                 .filter(visualizacion -> visualizacion.perteneceAlMes(anio, mes))
                 .sorted(Comparator.comparing(Visualizacion::getFechaVisualizacion).reversed())
                 .toList();

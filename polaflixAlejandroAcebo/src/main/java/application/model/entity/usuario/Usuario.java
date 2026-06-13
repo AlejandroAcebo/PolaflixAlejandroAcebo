@@ -2,6 +2,7 @@ package application.model.entity.usuario;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -162,6 +163,46 @@ public class Usuario {
                 .build();
         this.seguimientos.put(seriePendiente, seguimientoSerie);
         return seguimientoSerie;
+    }
+
+    public List<SeguimientoSerie> seguimientosRegistrados() {
+        if (seguimientos == null) {
+            return List.of();
+        }
+        return seguimientos.values().stream().toList();
+    }
+
+    public Optional<SeguimientoSerie> seguimientoDeSerie(int idSerie) {
+        return seguimientosRegistrados().stream()
+                .filter(seguimiento -> seguimiento.getSerie() != null)
+                .filter(seguimiento -> seguimiento.getSerie().getIdSerie() == idSerie)
+                .findFirst();
+    }
+
+    public List<Visualizacion> visualizacionesRegistradas() {
+        return visualizacionesPersistidas == null ? List.of() : visualizacionesPersistidas;
+    }
+
+    public Optional<Visualizacion> visualizacionDe(Capitulo capitulo) {
+        if (capitulo == null) {
+            return Optional.empty();
+        }
+
+        int idCapitulo = capitulo.getIdCapitulo();
+        return visualizacionesRegistradas().stream()
+                .filter(visualizacion -> visualizacion.idCapitulo() == idCapitulo)
+                .findFirst();
+    }
+
+    public List<Visualizacion> visualizacionesDe(Serie serie) {
+        if (serie == null) {
+            return List.of();
+        }
+
+        int idSerie = serie.getIdSerie();
+        return visualizacionesRegistradas().stream()
+                .filter(visualizacion -> visualizacion.idSerie() == idSerie)
+                .toList();
     }
     
     public Visualizacion visualizarCapitulo(Capitulo capitulo, Serie serie) {

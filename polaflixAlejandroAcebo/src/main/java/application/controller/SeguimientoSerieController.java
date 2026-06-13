@@ -1,13 +1,14 @@
 package application.controller;
 
-import java.net.URI;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import application.model.entity.seguimientoserie.SeguimientoSerie;
 import application.model.request.SeguimientoSerieRequest;
+import application.model.view.ErrorView;
 import application.model.view.Views;
 import application.service.SeguimientoSerieService;
 import jakarta.validation.Valid;
@@ -32,42 +34,25 @@ public class SeguimientoSerieController {
         this.seguimientoSerieService = seguimientoSerieService;
     }
 
-    @GetMapping
-    @JsonView(Views.Summary.class)
-    public List<SeguimientoSerie> getSeguimientos(@PathVariable("usuarioId") @Positive int usuarioId) {
-        return seguimientoSerieService.findByUsuarioId(usuarioId);
-    }
-
-    @GetMapping("/{id}")
-    @JsonView(Views.Detail.class)
-    public SeguimientoSerie getSeguimientoById(
-            @PathVariable("usuarioId") @Positive int usuarioId,
-            @PathVariable("id") @Positive int id) {
-        return seguimientoSerieService.findById(id);
-    }
-
     @PostMapping
     @JsonView(Views.Detail.class)
+    @Operation(summary = "Agregar una serie a pendientes")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Serie agregada al espacio personal",
+                    content = @Content(schema = @Schema(implementation = SeguimientoSerie.class))),
+            @ApiResponse(responseCode = "400", description = "Solicitud no valida",
+                    content = @Content(schema = @Schema(implementation = ErrorView.class))),
+            @ApiResponse(responseCode = "404", description = "Usuario o serie no encontrados",
+                    content = @Content(schema = @Schema(implementation = ErrorView.class))),
+            @ApiResponse(responseCode = "409", description = "Conflicto de datos",
+                    content = @Content(schema = @Schema(implementation = ErrorView.class))),
+            @ApiResponse(responseCode = "500", description = "Error interno",
+                    content = @Content(schema = @Schema(implementation = ErrorView.class)))
+    })
     public ResponseEntity<SeguimientoSerie> createSeguimiento(
             @PathVariable("usuarioId") @Positive int usuarioId,
             @Valid @RequestBody SeguimientoSerieRequest request) {
         SeguimientoSerie createdSeguimiento = seguimientoSerieService.create(usuarioId, request);
-        return ResponseEntity.created(URI.create("/usuarios/" + usuarioId + "/seguimientos/" + createdSeguimiento.getIdSeguimientoSerie())).body(createdSeguimiento);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSeguimiento(
-            @PathVariable("usuarioId") @Positive int usuarioId,
-            @PathVariable("id") @Positive int id) {
-        seguimientoSerieService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/series/{serieId}")
-    public ResponseEntity<Void> deleteSeguimientoBySerie(
-            @PathVariable("usuarioId") @Positive int usuarioId,
-            @PathVariable("serieId") @Positive int serieId) {
-        seguimientoSerieService.deleteBySerie(usuarioId, serieId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSeguimiento);
     }
 }

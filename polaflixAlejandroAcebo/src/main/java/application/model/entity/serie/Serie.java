@@ -81,6 +81,12 @@ public class Serie {
         return capitulos().size();
     }
 
+    public Optional<Capitulo> buscarCapitulo(int idCapitulo) {
+        return capitulos().stream()
+                .filter(capitulo -> capitulo.getIdCapitulo() == idCapitulo)
+                .findFirst();
+    }
+
     public boolean esUltimoCapitulo(Capitulo capitulo) {
         return ultimoCapitulo()
                 .map(ultimo -> ultimo.equals(capitulo))
