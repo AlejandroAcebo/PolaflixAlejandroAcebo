@@ -813,6 +813,18 @@ public class AppFeeder implements CommandLineRunner {
                 .build();
     }
 
+    private ArrayList<Visualizacion> visualizacionesDe(
+            Usuario usuario,
+            List<Visualizacion> visualizaciones) {
+        ArrayList<Visualizacion> visualizacionesUsuario = new ArrayList<>();
+        for (Visualizacion visualizacion : visualizaciones) {
+            if (visualizacion.getUsuario() == usuario) {
+                visualizacionesUsuario.add(visualizacion);
+            }
+        }
+        return visualizacionesUsuario;
+    }
+
     private Map<Serie, List<Visualizacion>> crearMapaVisualizacionesUsuario(
             Usuario usuario,
             List<Visualizacion> visualizaciones) {
@@ -825,18 +837,6 @@ public class AppFeeder implements CommandLineRunner {
             visualizacionesUsuario
                     .computeIfAbsent(serie, key -> new ArrayList<>())
                     .add(visualizacion);
-        }
-        return visualizacionesUsuario;
-    }
-
-    private ArrayList<Visualizacion> visualizacionesDe(
-            Usuario usuario,
-            List<Visualizacion> visualizaciones) {
-        ArrayList<Visualizacion> visualizacionesUsuario = new ArrayList<>();
-        for (Visualizacion visualizacion : visualizaciones) {
-            if (visualizacion.getUsuario() == usuario) {
-                visualizacionesUsuario.add(visualizacion);
-            }
         }
         return visualizacionesUsuario;
     }

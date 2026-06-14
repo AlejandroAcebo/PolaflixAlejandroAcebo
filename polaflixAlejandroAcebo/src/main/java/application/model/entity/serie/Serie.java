@@ -1,6 +1,7 @@
 package application.model.entity.serie;
 
 import java.util.List;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -51,7 +52,7 @@ public class Serie {
     @JsonView(Views.Summary.class)
     private TipoSerie tipoSerie;
     
-    @OneToMany(mappedBy="serie",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Temporada> temporadas;
     
@@ -79,6 +80,16 @@ public class Serie {
 
     public int totalCapitulos() {
         return capitulos().size();
+    }
+
+    public List<Temporada> temporadasOrdenadas() {
+        if (temporadas == null) {
+            return List.of();
+        }
+        return temporadas.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(Temporada::getNumeroTemporada))
+                .toList();
     }
 
     public Optional<Capitulo> buscarCapitulo(int idCapitulo) {
@@ -129,16 +140,9 @@ public class Serie {
     }
 
     private List<Capitulo> capitulos() {
-        if (temporadas == null) {
-            return List.of();
-        }
-
-        return temporadas.stream()
-                .filter(Objects::nonNull)
-                .map(Temporada::getCapitulos)
-                .filter(Objects::nonNull)
+        return temporadasOrdenadas().stream()
+                .map(Temporada::capitulosOrdenados)
                 .flatMap(List::stream)
-                .filter(Objects::nonNull)
                 .toList();
     }
 

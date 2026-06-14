@@ -2,19 +2,15 @@ package application.service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import application.exception.BadRequestException;
 import application.exception.ResourceNotFoundException;
 import application.model.entity.persona.Persona;
 import application.model.entity.seguimientoserie.SeguimientoSerie;
 import application.model.entity.seguimientoserie.Visualizacion;
-import application.model.entity.serie.Capitulo;
 import application.model.entity.serie.Serie;
 import application.model.entity.serie.Temporada;
 import application.model.entity.usuario.Usuario;
@@ -50,23 +46,11 @@ public class PantallaUsuarioService {
     @Transactional(readOnly = true)
     public UsuarioHomeView getHome(int usuarioId) {
         Usuario usuario = getUsuario(usuarioId);
-        List<Visualizacion> visualizaciones = usuario.visualizacionesRegistradas();
-
-        Map<Integer, Set<Integer>> vistosPorSerie = visualizaciones.stream()
-                .collect(Collectors.groupingBy(
-                        Visualizacion::idSerie,
-                        Collectors.mapping(Visualizacion::idCapitulo, Collectors.toSet())));
-
-        List<SeriePersonalView> series = usuario.seguimientosRegistrados().stream()
-                .map(seguimiento -> toSeriePersonal(seguimiento, vistosPorSerie))
-                .sorted(Comparator.comparing(SeriePersonalView::nombreSerie))
-                .toList();
-
         return new UsuarioHomeView(
                 toUsuarioResumen(usuario),
-                filtrarPorEstado(series, EstadoSerie.EMPEZADA),
-                filtrarPorEstado(series, EstadoSerie.PENDIENTE),
-                filtrarPorEstado(series, EstadoSerie.TERMINADA));
+                toSeriesPersonales(usuario, EstadoSerie.EMPEZADA),
+                toSeriesPersonales(usuario, EstadoSerie.PENDIENTE),
+                toSeriesPersonales(usuario, EstadoSerie.TERMINADA));
     }
 
     @Transactional(readOnly = true)
@@ -77,20 +61,14 @@ public class PantallaUsuarioService {
                         "La serie no esta en el espacio personal del usuario"));
         Serie serie = seguimiento.getSerie();
 
-        Set<Integer> capitulosVistos = usuario.visualizacionesRegistradas().stream()
-                .map(Visualizacion::idCapitulo)
-                .collect(Collectors.toSet());
+        Set<Integer> capitulosVistos = usuario.idsCapitulosVistos();
 
-        List<TemporadaDetalleView> temporadas = serie.getTemporadas().stream()
-                .sorted(Comparator.comparingInt(Temporada::getNumeroTemporada))
+        List<TemporadaDetalleView> temporadas = serie.temporadasOrdenadas().stream()
                 .map(temporada -> toTemporadaDetalle(temporada, capitulosVistos))
                 .toList();
 
         int totalCapitulos = serie.totalCapitulos();
-        int vistos = (int) temporadas.stream()
-                .flatMap(temporada -> temporada.capitulos().stream())
-                .filter(CapituloDetalleView::visto)
-                .count();
+        int vistos = usuario.capitulosVistosDe(serie);
 
         return new SerieDetalleView(
                 toSerieResponse(serie),
@@ -105,14 +83,11 @@ public class PantallaUsuarioService {
     public CatalogoView getCatalogo(int usuarioId, String inicial) {
         Usuario usuario = getUsuario(usuarioId);
         String inicialNormalizada = Serie.normalizarInicialCatalogo(inicial);
-        Set<Integer> seriesAgregadas = usuario.seguimientosRegistrados().stream()
-                .map(seguimiento -> seguimiento.getSerie().getIdSerie())
-                .collect(Collectors.toSet());
 
         List<SerieCatalogoView> series = serieRepository.findAll().stream()
                 .filter(serie -> serie.inicialCatalogo().equals(inicialNormalizada))
                 .sorted(Comparator.comparing(Serie::getNombreSerie))
-                .map(serie -> toSerieCatalogo(serie, seriesAgregadas.contains(serie.getIdSerie())))
+                .map(serie -> toSerieCatalogo(serie, usuario.tieneSerieEnEspacioPersonal(serie)))
                 .toList();
 
         return new CatalogoView(inicialNormalizada, series);
@@ -121,20 +96,13 @@ public class PantallaUsuarioService {
     @Transactional(readOnly = true)
     public SerieCatalogoView buscarSerieCatalogo(int usuarioId, String nombre) {
         Usuario usuario = getUsuario(usuarioId);
-        String busqueda = nombre == null ? "" : nombre.trim().toLowerCase();
-        if (busqueda.isBlank()) {
-            throw new BadRequestException("Debe indicarse un nombre de serie");
-        }
-
-        Set<Integer> seriesAgregadas = usuario.seguimientosRegistrados().stream()
-                .map(seguimiento -> seguimiento.getSerie().getIdSerie())
-                .collect(Collectors.toSet());
+        String busqueda = nombre.trim().toLowerCase();
 
         return serieRepository.findAll().stream()
                 .filter(serie -> serie.coincideConBusqueda(busqueda))
                 .sorted(Comparator.comparing(Serie::getNombreSerie))
                 .findFirst()
-                .map(serie -> toSerieCatalogo(serie, seriesAgregadas.contains(serie.getIdSerie())))
+                .map(serie -> toSerieCatalogo(serie, usuario.tieneSerieEnEspacioPersonal(serie)))
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No se ha encontrado ninguna serie con ese nombre"));
     }
@@ -144,16 +112,13 @@ public class PantallaUsuarioService {
         Usuario usuario = getUsuario(usuarioId);
         boolean cuotaFija = usuario.tieneCuotaFija();
 
-        List<Visualizacion> visualizacionesMes = usuario.visualizacionesRegistradas().stream()
-                .filter(visualizacion -> visualizacion.perteneceAlMes(anio, mes))
-                .sorted(Comparator.comparing(Visualizacion::getFechaVisualizacion).reversed())
-                .toList();
+        List<Visualizacion> visualizacionesMes = usuario.visualizacionesDelMes(anio, mes);
 
         List<CargoFacturaView> cargos = visualizacionesMes.stream()
                 .map(this::toCargoFactura)
                 .toList();
 
-        double total = usuario.calcularTotalFacturaMensual(visualizacionesMes);
+        double total = usuario.calcularTotalFacturaMensual(anio, mes);
 
         return new FacturaMensualView(anio, mes, cuotaFija, cargos, total);
     }
@@ -161,21 +126,20 @@ public class PantallaUsuarioService {
     private Usuario getUsuario(int usuarioId) {
         return usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "No existe el usuario con id " + usuarioId));
+                "No existe el usuario con id " + usuarioId));
     }
 
-    private List<SeriePersonalView> filtrarPorEstado(
-            List<SeriePersonalView> series,
-            EstadoSerie estado) {
-        return series.stream()
-                .filter(serie -> estado.name().equals(serie.seguimiento().estadoSerie()))
+    private List<SeriePersonalView> toSeriesPersonales(Usuario usuario, EstadoSerie estado) {
+        return usuario.seguimientosPorEstado(estado).stream()
+                .map(seguimiento -> toSeriePersonal(usuario, seguimiento))
+                .sorted(Comparator.comparing(SeriePersonalView::nombreSerie))
                 .toList();
     }
 
-    private SeriePersonalView toSeriePersonal(SeguimientoSerie seguimiento, Map<Integer, Set<Integer>> vistosPorSerie) {
+    private SeriePersonalView toSeriePersonal(Usuario usuario, SeguimientoSerie seguimiento) {
         Serie serie = seguimiento.getSerie();
         int totalCapitulos = serie.totalCapitulos();
-        int capitulosVistos = vistosPorSerie.getOrDefault(serie.getIdSerie(), Set.of()).size();
+        int capitulosVistos = usuario.capitulosVistosDe(serie);
         return new SeriePersonalView(
                 serie.getIdSerie(),
                 serie.getNombreSerie(),
@@ -183,14 +147,13 @@ public class PantallaUsuarioService {
                 tipoSerie(serie),
                 nombres(serie.getCreadores()),
                 nombres(serie.getActores()),
-                toSeguimientoResumen(seguimiento, seguimiento.estadoEfectivo(capitulosVistos)),
+                toSeguimientoResumen(seguimiento, usuario.estadoEfectivoDe(seguimiento)),
                 totalCapitulos,
                 capitulosVistos);
     }
 
     private TemporadaDetalleView toTemporadaDetalle(Temporada temporada, Set<Integer> capitulosVistos) {
-        List<CapituloDetalleView> capitulos = temporada.getCapitulos().stream()
-                .sorted(Comparator.comparingInt(Capitulo::getNumeroCapitulo))
+        List<CapituloDetalleView> capitulos = temporada.capitulosOrdenados().stream()
                 .map(capitulo -> new CapituloDetalleView(
                         capitulo.getIdCapitulo(),
                         temporada.getIdTemporada(),

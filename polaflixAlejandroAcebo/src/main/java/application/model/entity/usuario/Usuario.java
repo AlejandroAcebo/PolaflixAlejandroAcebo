@@ -3,6 +3,9 @@ package application.model.entity.usuario;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -70,7 +73,7 @@ public class Usuario {
     private String cuentaBancaria;
     
     @ManyToOne
-    @JoinColumn(name = "idPlan")
+    @JoinColumn(name = "idPlan", nullable = false)
     @JsonIgnore
     private Plan plan;
     
@@ -92,7 +95,7 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Visualizacion> visualizacionesPersistidas;
-    
+
     @Transient
     @JsonIgnore
     private Map<Serie, List<Visualizacion>> visualizaciones;
@@ -179,6 +182,23 @@ public class Usuario {
                 .findFirst();
     }
 
+    public boolean tieneSerieEnEspacioPersonal(Serie serie) {
+        return serie != null && seguimientoDeSerie(serie.getIdSerie()).isPresent();
+    }
+
+    public List<SeguimientoSerie> seguimientosPorEstado(EstadoSerie estadoSerie) {
+        return seguimientosRegistrados().stream()
+                .filter(seguimiento -> estadoSerie == estadoEfectivoDe(seguimiento))
+                .toList();
+    }
+
+    public EstadoSerie estadoEfectivoDe(SeguimientoSerie seguimiento) {
+        if (seguimiento == null) {
+            return EstadoSerie.PENDIENTE;
+        }
+        return seguimiento.estadoEfectivo(capitulosVistosDe(seguimiento.getSerie()));
+    }
+
     public List<Visualizacion> visualizacionesRegistradas() {
         return visualizacionesPersistidas == null ? List.of() : visualizacionesPersistidas;
     }
@@ -204,6 +224,28 @@ public class Usuario {
                 .filter(visualizacion -> visualizacion.idSerie() == idSerie)
                 .toList();
     }
+
+    public Set<Integer> idsCapitulosVistos() {
+        return visualizacionesRegistradas().stream()
+                .map(Visualizacion::idCapitulo)
+                .collect(Collectors.toSet());
+    }
+
+    public int capitulosVistosDe(Serie serie) {
+        return serie == null
+                ? 0
+                : (int) visualizacionesDe(serie).stream()
+                        .map(Visualizacion::idCapitulo)
+                        .distinct()
+                        .count();
+    }
+
+    public List<Visualizacion> visualizacionesDelMes(int anio, int mes) {
+        return visualizacionesRegistradas().stream()
+                .filter(visualizacion -> visualizacion.perteneceAlMes(anio, mes))
+                .sorted(Comparator.comparing(Visualizacion::getFechaVisualizacion).reversed())
+                .toList();
+    }
     
     public Visualizacion visualizarCapitulo(Capitulo capitulo, Serie serie) {
         Visualizacion visualizacion = Visualizacion.builder()
@@ -212,14 +254,26 @@ public class Usuario {
                 .usuario(this)
                 .build();
         if (visualizaciones == null) {
-            visualizaciones = new java.util.LinkedHashMap<>();
+            visualizaciones = new LinkedHashMap<>();
         }
-        getVisualizaciones().computeIfAbsent(serie, key -> new java.util.ArrayList<>()).add(visualizacion);
+        visualizaciones.computeIfAbsent(serie, key -> new ArrayList<>()).add(visualizacion);
         if (visualizacionesPersistidas == null) {
-            visualizacionesPersistidas = new java.util.ArrayList<>();
+            visualizacionesPersistidas = new ArrayList<>();
         }
         visualizacionesPersistidas.add(visualizacion);
         return visualizacion;
+    }
+
+    public Optional<Visualizacion> registrarVisualizacion(Serie serie, Capitulo capitulo) {
+        Optional<SeguimientoSerie> seguimiento = seguimientoDeSerie(serie == null ? 0 : serie.getIdSerie());
+        if (seguimiento.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Visualizacion visualizacion = visualizacionDe(capitulo)
+                .orElseGet(() -> visualizarCapitulo(capitulo, serie));
+        seguimiento.get().registrarVisualizacion(capitulo, visualizacionesDe(serie));
+        return Optional.of(visualizacion);
     }
 
     public boolean tieneCuotaFija() {
@@ -237,6 +291,10 @@ public class Usuario {
         return visualizacionesDelMes.stream()
                 .mapToDouble(Visualizacion::precio)
                 .sum();
+    }
+
+    public double calcularTotalFacturaMensual(int anio, int mes) {
+        return calcularTotalFacturaMensual(visualizacionesDelMes(anio, mes));
     }
 
     public static List<CargoRol> cargosPorDefectoSiVacio(List<CargoRol> cargos) {

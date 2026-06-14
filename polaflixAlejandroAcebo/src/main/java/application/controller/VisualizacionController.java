@@ -1,6 +1,5 @@
 package application.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import application.model.entity.seguimientoserie.Visualizacion;
 import application.model.request.VisualizacionRequest;
 import application.model.view.ErrorView;
-import application.model.view.Views;
+import application.model.view.VisualizacionRegistradaView;
 import application.service.VisualizacionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -35,11 +34,10 @@ public class VisualizacionController {
     }
 
     @PostMapping
-    @JsonView(Views.Detail.class)
     @Operation(summary = "Marcar un capitulo como visto")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Visualizacion registrada",
-                    content = @Content(schema = @Schema(implementation = Visualizacion.class))),
+                    content = @Content(schema = @Schema(implementation = VisualizacionRegistradaView.class))),
             @ApiResponse(responseCode = "400", description = "Solicitud no valida",
                     content = @Content(schema = @Schema(implementation = ErrorView.class))),
             @ApiResponse(responseCode = "404", description = "Usuario, capitulo o seguimiento no encontrado",
@@ -49,10 +47,20 @@ public class VisualizacionController {
             @ApiResponse(responseCode = "500", description = "Error interno",
                     content = @Content(schema = @Schema(implementation = ErrorView.class)))
     })
-    public ResponseEntity<Visualizacion> createVisualizacion(
+    public ResponseEntity<VisualizacionRegistradaView> createVisualizacion(
             @PathVariable("usuarioId") @Positive int usuarioId,
             @Valid @RequestBody VisualizacionRequest request) {
         Visualizacion createdVisualizacion = visualizacionService.create(usuarioId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdVisualizacion);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toView(createdVisualizacion));
+    }
+
+    private VisualizacionRegistradaView toView(Visualizacion visualizacion) {
+        return new VisualizacionRegistradaView(
+                visualizacion.getIdVisualizacion(),
+                visualizacion.getFechaVisualizacion().toString(),
+                visualizacion.getIdUsuario(),
+                visualizacion.getIdCapitulo(),
+                visualizacion.idTemporada(),
+                visualizacion.idSerie());
     }
 }

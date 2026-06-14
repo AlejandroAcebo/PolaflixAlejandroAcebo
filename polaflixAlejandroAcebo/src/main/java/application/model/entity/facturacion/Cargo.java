@@ -8,27 +8,31 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import application.model.entity.seguimientoserie.Visualizacion;
 import application.model.view.Views;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 
 
-@Value
 @Embeddable
-@NoArgsConstructor(force = true)
+@Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class Cargo {
     
+    @Column(nullable = false)
     @JsonView(Views.Summary.class)
     private LocalDate fecha;
     
+    @Column(nullable = false)
     @JsonView(Views.Summary.class)
     private double precio;
     
+    @Column(nullable = false)
     @JsonView(Views.Summary.class)
     private String nombreSerie;
 

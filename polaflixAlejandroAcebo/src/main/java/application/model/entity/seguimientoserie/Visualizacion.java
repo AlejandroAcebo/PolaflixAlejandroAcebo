@@ -11,6 +11,7 @@ import application.model.entity.serie.Serie;
 import application.model.entity.serie.Temporada;
 import application.model.entity.usuario.Usuario;
 import application.model.view.Views;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +38,7 @@ public class Visualizacion {
     @JsonView(Views.Summary.class)
     private Integer idVisualizacion;
     
+    @Column(nullable = false)
     @JsonView(Views.Summary.class)
     private LocalDate fechaVisualizacion;
     

@@ -1,6 +1,8 @@
 package application.model.entity.serie;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,6 +14,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -35,6 +38,7 @@ public class Temporada {
     private int idTemporada;
     
     @ManyToOne
+    @JoinColumn(name = "idSerie", nullable = false)
     @JsonIgnore
     private Serie serie;
     
@@ -44,7 +48,7 @@ public class Temporada {
     @JsonView(Views.Summary.class)
     private int numeroTemporada;
     
-    @OneToMany(mappedBy = "temporada", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "temporada", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Capitulo> capitulos;
 
@@ -60,6 +64,16 @@ public class Temporada {
     @JsonView(Views.Summary.class)
     public int getIdSerie() {
         return serie == null ? 0 : serie.getIdSerie();
+    }
+
+    public List<Capitulo> capitulosOrdenados() {
+        if (capitulos == null) {
+            return List.of();
+        }
+        return capitulos.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingInt(Capitulo::getNumeroCapitulo))
+                .toList();
     }
 
     @Override

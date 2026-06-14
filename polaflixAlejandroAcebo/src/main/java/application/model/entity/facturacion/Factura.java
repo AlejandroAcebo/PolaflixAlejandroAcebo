@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import application.model.entity.usuario.Usuario;
 import application.model.view.Views;
 import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -36,6 +37,7 @@ public class Factura {
     @JsonView(Views.Summary.class)
     private int idFactura;
     
+    @Column(nullable = false)
     @JsonView(Views.Summary.class)
     private LocalDate fecha;
     

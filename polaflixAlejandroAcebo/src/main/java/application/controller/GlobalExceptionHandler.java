@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import application.exception.BadRequestException;
 import application.exception.ResourceConflictException;
 import application.exception.ResourceNotFoundException;
 import application.model.view.ErrorView;
@@ -40,13 +39,6 @@ public class GlobalExceptionHandler {
             ResourceConflictException ex,
             HttpServletRequest request) {
         return buildError(HttpStatus.CONFLICT, "RESOURCE_CONFLICT", ex.getMessage(), request);
-    }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorView> handleBadRequest(
-            BadRequestException ex,
-            HttpServletRequest request) {
-        return buildError(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", ex.getMessage(), request);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

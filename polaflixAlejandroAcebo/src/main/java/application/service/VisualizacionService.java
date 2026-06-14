@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import application.exception.ResourceNotFoundException;
-import application.model.entity.seguimientoserie.SeguimientoSerie;
 import application.model.entity.seguimientoserie.Visualizacion;
 import application.model.entity.serie.Capitulo;
 import application.model.entity.serie.Serie;
@@ -34,14 +33,9 @@ public class VisualizacionService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No existe el capitulo con id " + request.getIdCapitulo()));
 
-        SeguimientoSerie seguimiento = usuario.seguimientoDeSerie(serie.getIdSerie())
+        Visualizacion visualizacion = usuario.registrarVisualizacion(serie, capitulo)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "La serie no esta en el espacio personal del usuario"));
-
-        Visualizacion visualizacion = usuario.visualizacionDe(capitulo)
-                .orElseGet(() -> usuario.visualizarCapitulo(capitulo, serie));
-
-        seguimiento.registrarVisualizacion(capitulo, usuario.visualizacionesDe(serie));
         usuarioRepository.saveAndFlush(usuario);
         return visualizacion;
     }
