@@ -17,6 +17,6 @@ export class SeguimientosApiService {
 
     return this.http
       .post<void>(`/usuarios/${usuarioId}/seguimientos`, body)
-      .pipe(catchError((error) => this.errorMessageService.toObservableError(error)));
+      .pipe(catchError((error) => this.errorMessageService.toObservableError(error, 'agregar la serie a pendientes')));
   }
 }

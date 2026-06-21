@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { catchError, map, Observable, of, startWith } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 
 import { UsuarioHomeView } from '../../modelos/modelo-pantalla-usuario';
 import { SeriesApiService } from '../../servicios/servicio-series-api';
@@ -15,15 +14,24 @@ type UserHomeState =
   templateUrl: './inicio.component.html',
   styleUrls: ['./inicio.component.css']
 })
-export class InicioComponent {
-  readonly state$: Observable<UserHomeState> = this.seriesApiService.getUsuarioHome(this.userSession.usuarioId).pipe(
-    map((view) => ({ status: 'success', view } as UserHomeState)),
-    startWith({ status: 'loading' } as UserHomeState),
-    catchError((error: Error) => of({ status: 'error', message: error.message } as UserHomeState))
-  );
+export class InicioComponent implements OnInit {
+  state: UserHomeState = { status: 'loading' };
 
   constructor(
     private readonly seriesApiService: SeriesApiService,
     private readonly userSession: UserSessionService
   ) {}
+
+  ngOnInit(): void {
+    this.cargarInicio();
+  }
+
+  private cargarInicio(): void {
+    this.state = { status: 'loading' };
+
+    this.seriesApiService.getUsuarioHome(this.userSession.usuarioId).subscribe({
+      next: (view) => this.state = { status: 'success', view },
+      error: (error: Error) => this.state = { status: 'error', message: error.message }
+    });
+  }
 }

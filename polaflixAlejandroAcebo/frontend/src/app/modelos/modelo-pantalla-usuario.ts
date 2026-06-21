@@ -4,9 +4,6 @@ export interface SeriePersonalView {
 }
 
 export interface UsuarioHomeView {
-  usuario: {
-    nombre: string;
-  };
   empezadas: SeriePersonalView[];
   pendientes: SeriePersonalView[];
   terminadas: SeriePersonalView[];
@@ -22,7 +19,6 @@ export interface SerieCatalogoView {
 }
 
 export interface CatalogoView {
-  inicial: string;
   series: SerieCatalogoView[];
 }
 
@@ -35,9 +31,7 @@ export interface CapituloDetalleView {
 }
 
 export interface TemporadaDetalleView {
-  idTemporada: number;
   nombreTemporada: string;
-  numeroTemporada: number;
   capitulos: CapituloDetalleView[];
 }
 
@@ -57,8 +51,6 @@ export interface CargoFacturaView {
 }
 
 export interface FacturaMensualView {
-  anio: number;
-  mes: number;
   cargos: CargoFacturaView[];
   total: number;
 }

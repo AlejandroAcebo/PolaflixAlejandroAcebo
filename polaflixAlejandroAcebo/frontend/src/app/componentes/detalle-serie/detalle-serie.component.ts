@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, catchError, combineLatest, map, Observable, of, startWith, switchMap, tap } from 'rxjs';
 
 import { SerieDetalleView, TemporadaDetalleView } from '../../modelos/modelo-pantalla-usuario';
 import { SeriesApiService } from '../../servicios/servicio-series-api';
@@ -16,24 +15,13 @@ type DetailState =
   templateUrl: './detalle-serie.component.html',
   styleUrls: ['./detalle-serie.component.css']
 })
-export class DetalleSerieComponent {
-  readonly temporadaIndex$ = new BehaviorSubject<number>(0);
+export class DetalleSerieComponent implements OnInit {
+  temporadaIndex = 0;
   actionError: string | null = null;
   selectedCapituloId: number | null = null;
+  state: DetailState = { status: 'loading' };
 
-  private readonly refresh$ = new BehaviorSubject<void>(undefined);
-  private readonly serieId$ = this.route.paramMap.pipe(map((params) => Number(params.get('serieId'))));
-
-  readonly state$: Observable<DetailState> = combineLatest([this.serieId$, this.refresh$]).pipe(
-    switchMap(([serieId]) =>
-      this.seriesApiService.getSerieDetalle(this.userSession.usuarioId, serieId).pipe(
-        tap((view) => this.temporadaIndex$.next(view.temporadaInicial)),
-        map((view) => ({ status: 'success', view } as DetailState))
-      )
-    ),
-    startWith({ status: 'loading' } as DetailState),
-    catchError((error: Error) => of({ status: 'error', message: error.message } as DetailState))
-  );
+  private serieId = 0;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -41,16 +29,21 @@ export class DetalleSerieComponent {
     private readonly userSession: UserSessionService
   ) {}
 
+  ngOnInit(): void {
+    this.serieId = Number(this.route.snapshot.paramMap.get('serieId'));
+    this.cargarDetalle();
+  }
+
   temporadaSeleccionada(temporadas: TemporadaDetalleView[], index: number): TemporadaDetalleView | null {
     return temporadas[index] ?? null;
   }
 
   cambiarTemporada(cantidad: number, total: number): void {
-    const siguiente = this.temporadaIndex$.value + cantidad;
+    const siguiente = this.temporadaIndex + cantidad;
     if (siguiente >= 0 && siguiente < total) {
       this.actionError = null;
       this.selectedCapituloId = null;
-      this.temporadaIndex$.next(siguiente);
+      this.temporadaIndex = siguiente;
     }
   }
 
@@ -59,14 +52,24 @@ export class DetalleSerieComponent {
   }
 
   marcarVisto(idCapitulo: number): void {
-    this.seriesApiService
-      .marcarCapituloComoVisto(this.userSession.usuarioId, idCapitulo)
-      .subscribe({
-        next: () => {
-          this.actionError = null;
-          this.refresh$.next();
-        },
-        error: (error: Error) => this.actionError = error.message
-      });
+    this.seriesApiService.marcarCapituloComoVisto(this.userSession.usuarioId, idCapitulo).subscribe({
+      next: () => {
+        this.actionError = null;
+        this.cargarDetalle();
+      },
+      error: (error: Error) => this.actionError = error.message
+    });
+  }
+
+  private cargarDetalle(): void {
+    this.state = { status: 'loading' };
+
+    this.seriesApiService.getSerieDetalle(this.userSession.usuarioId, this.serieId).subscribe({
+      next: (view) => {
+        this.temporadaIndex = view.temporadaInicial;
+        this.state = { status: 'success', view };
+      },
+      error: (error: Error) => this.state = { status: 'error', message: error.message }
+    });
   }
 }

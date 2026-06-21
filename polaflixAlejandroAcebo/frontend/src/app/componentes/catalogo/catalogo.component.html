@@ -4,7 +4,7 @@
       <button
         *ngFor="let letter of letters"
         type="button"
-        [class.active]="(activeLetter$ | async) === letter"
+        [class.active]="activeLetter === letter"
         (click)="setLetter(letter)"
       >
         {{ letter }}
@@ -19,46 +19,44 @@
 
   <app-error-alert *ngIf="actionError as actionErrorMessage" [message]="actionErrorMessage"></app-error-alert>
 
-  <ng-container *ngIf="state$ | async as state">
-    <app-loading-state *ngIf="state.status === 'loading'" message="Cargando series..."></app-loading-state>
+  <app-loading-state *ngIf="state.status === 'loading'" message="Cargando series..."></app-loading-state>
 
-    <app-error-alert
-      *ngIf="state.status === 'error'"
-      [message]="state.message"
-    ></app-error-alert>
+  <app-error-alert
+    *ngIf="state.status === 'error'"
+    [message]="state.message"
+  ></app-error-alert>
 
-    <ng-container *ngIf="state.status === 'success'">
-      <app-empty-state
-        *ngIf="state.view.series.length === 0"
-        title="No hay series"
-        text="No hay series para la inicial seleccionada."
-      ></app-empty-state>
+  <ng-container *ngIf="state.status === 'success'">
+    <app-empty-state
+      *ngIf="state.view.series.length === 0"
+      title="No hay series"
+      text="No hay series para la inicial seleccionada."
+    ></app-empty-state>
 
-      <ul *ngIf="state.view.series.length > 0" class="catalog-list">
-        <li *ngFor="let serie of state.view.series">
-          <div class="serie-row">
-            <button type="button" class="title-button" (click)="toggleDetalle(serie.idSerie)">
-              {{ serie.nombreSerie }}
-            </button>
+    <ul *ngIf="state.view.series.length > 0" class="catalog-list">
+      <li *ngFor="let serie of state.view.series">
+        <div class="serie-row">
+          <button type="button" class="title-button" (click)="toggleDetalle(serie.idSerie)">
+            {{ serie.nombreSerie }}
+          </button>
 
-            <button
-              type="button"
-              class="add-link"
-              [class.added]="serie.agregada"
-              [disabled]="serie.agregada"
-              (click)="addSerie(serie)"
-            >
-              {{ serie.agregada ? 'Agregada' : 'Agregar' }}
-            </button>
-          </div>
+          <button
+            type="button"
+            class="add-link"
+            [class.added]="serie.agregada"
+            [disabled]="serie.agregada"
+            (click)="addSerie(serie)"
+          >
+            {{ serie.agregada ? 'Agregada' : 'Agregar' }}
+          </button>
+        </div>
 
-          <section *ngIf="selectedSerieId === serie.idSerie" class="serie-detail">
-            <p>{{ serie.sinopsis }}</p>
-            <p><strong>Creador:</strong> {{ serie.creadores.join(', ') || 'No disponible' }}</p>
-            <p><strong>Actores:</strong> {{ serie.actores.join(', ') || 'No disponible' }}</p>
-          </section>
-        </li>
-      </ul>
-    </ng-container>
+        <section *ngIf="selectedSerieId === serie.idSerie" class="serie-detail">
+          <p>{{ serie.sinopsis }}</p>
+          <p><strong>Creador:</strong> {{ serie.creadores.join(', ') || 'No disponible' }}</p>
+          <p><strong>Actores:</strong> {{ serie.actores.join(', ') || 'No disponible' }}</p>
+        </section>
+      </li>
+    </ul>
   </ng-container>
 </section>

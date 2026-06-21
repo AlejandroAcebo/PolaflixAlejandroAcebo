@@ -1,39 +1,32 @@
 <section class="page">
-  <ng-container *ngIf="state$ | async as state">
-    <app-loading-state *ngIf="state.status === 'loading'" message="Cargando serie..."></app-loading-state>
+  <app-loading-state *ngIf="state.status === 'loading'" message="Cargando serie..."></app-loading-state>
 
-    <app-error-alert *ngIf="state.status === 'error'" [message]="state.message"></app-error-alert>
+  <app-error-alert *ngIf="state.status === 'error'" [message]="state.message"></app-error-alert>
 
-    <ng-container *ngIf="state.status === 'success'">
-      <app-error-alert *ngIf="actionError as actionErrorMessage" [message]="actionErrorMessage"></app-error-alert>
+  <ng-container *ngIf="state.status === 'success'">
+    <app-error-alert *ngIf="actionError as actionErrorMessage" [message]="actionErrorMessage"></app-error-alert>
 
-      <ng-container *ngIf="{ index: (temporadaIndex$ | async) ?? 0 } as temporadaState">
-        <header class="serie-header">
-          <button type="button" aria-label="Temporada anterior" (click)="cambiarTemporada(-1, state.view.temporadas.length)">&lt;</button>
-          <h2>
-            {{ state.view.serie.nombreSerie }}
-            <span *ngIf="temporadaSeleccionada(state.view.temporadas, temporadaState.index) as temporada">
-              - {{ temporada.nombreTemporada }}
-            </span>
-          </h2>
-          <button type="button" aria-label="Temporada siguiente" (click)="cambiarTemporada(1, state.view.temporadas.length)">&gt;</button>
-        </header>
+    <ng-container *ngIf="temporadaSeleccionada(state.view.temporadas, temporadaIndex) as temporada">
+      <header class="serie-header">
+        <button type="button" aria-label="Temporada anterior" (click)="cambiarTemporada(-1, state.view.temporadas.length)">&lt;</button>
+        <h2>{{ state.view.serie.nombreSerie }} - {{ temporada.nombreTemporada }}</h2>
+        <button type="button" aria-label="Temporada siguiente" (click)="cambiarTemporada(1, state.view.temporadas.length)">&gt;</button>
+      </header>
 
-        <section *ngIf="temporadaSeleccionada(state.view.temporadas, temporadaState.index) as temporada" class="episodes">
-          <article *ngFor="let capitulo of temporada.capitulos">
-            <button type="button" class="chapter-title" (click)="toggleDescripcion(capitulo.idCapitulo)">
-              Ep{{ capitulo.numeroCapitulo }}. {{ capitulo.nombreCapitulo }}
-            </button>
-            <button type="button" [disabled]="capitulo.visto" (click)="marcarVisto(capitulo.idCapitulo)">
-              {{ capitulo.visto ? 'Visto' : 'Ver' }}
-            </button>
+      <section class="episodes">
+        <article *ngFor="let capitulo of temporada.capitulos">
+          <button type="button" class="chapter-title" (click)="toggleDescripcion(capitulo.idCapitulo)">
+            Ep{{ capitulo.numeroCapitulo }}. {{ capitulo.nombreCapitulo }}
+          </button>
+          <button type="button" [disabled]="capitulo.visto" (click)="marcarVisto(capitulo.idCapitulo)">
+            {{ capitulo.visto ? 'Visto' : 'Ver' }}
+          </button>
 
-            <p *ngIf="selectedCapituloId === capitulo.idCapitulo">
-              {{ capitulo.descripcion }}
-            </p>
-          </article>
-        </section>
-      </ng-container>
+          <p *ngIf="selectedCapituloId === capitulo.idCapitulo">
+            {{ capitulo.descripcion }}
+          </p>
+        </article>
+      </section>
     </ng-container>
   </ng-container>
 </section>

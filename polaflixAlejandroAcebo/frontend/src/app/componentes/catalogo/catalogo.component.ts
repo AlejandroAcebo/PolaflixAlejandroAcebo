@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { BehaviorSubject, catchError, combineLatest, map, Observable, of, startWith, switchMap, tap } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 
 import { CatalogoView, SerieCatalogoView } from '../../modelos/modelo-pantalla-usuario';
 import { SeguimientosApiService } from '../../servicios/servicio-seguimientos-api';
@@ -16,31 +15,13 @@ type SeriesListState =
   templateUrl: './catalogo.component.html',
   styleUrls: ['./catalogo.component.css']
 })
-export class CatalogoComponent {
+export class CatalogoComponent implements OnInit {
   readonly letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0-9'.split('');
+
+  activeLetter = 'A';
   actionError: string | null = null;
   selectedSerieId: number | null = null;
-
-  private readonly activeLetterSubject = new BehaviorSubject<string>('A');
-  private readonly refreshSubject = new BehaviorSubject<void>(undefined);
-
-  readonly activeLetter$ = this.activeLetterSubject.asObservable();
-
-  readonly state$: Observable<SeriesListState> = combineLatest([
-    this.activeLetterSubject,
-    this.refreshSubject
-  ]).pipe(
-    switchMap(([activeLetter]) =>
-      this.seriesApiService.getCatalogo(this.userSession.usuarioId, activeLetter).pipe(
-        map((catalogo) => ({
-          status: 'success',
-          view: catalogo
-        }) as SeriesListState)
-      )
-    ),
-    startWith({ status: 'loading' } as SeriesListState),
-    catchError((error: Error) => of({ status: 'error', message: error.message } as SeriesListState))
-  );
+  state: SeriesListState = { status: 'loading' };
 
   constructor(
     private readonly seriesApiService: SeriesApiService,
@@ -48,30 +29,33 @@ export class CatalogoComponent {
     private readonly userSession: UserSessionService
   ) {}
 
+  ngOnInit(): void {
+    this.cargarCatalogo();
+  }
+
   setLetter(letter: string): void {
+    this.activeLetter = letter;
     this.actionError = null;
     this.selectedSerieId = null;
-    this.activeLetterSubject.next(letter);
+    this.cargarCatalogo();
   }
 
   search(term: string, event?: Event): void {
     event?.preventDefault();
 
     const normalizedTerm = term.trim().toLowerCase();
-
     if (!normalizedTerm) {
       return;
     }
 
     this.seriesApiService.buscarSerieCatalogo(this.userSession.usuarioId, normalizedTerm).subscribe({
       next: (found) => {
+        this.activeLetter = this.getInitial(found.nombreSerie);
         this.actionError = null;
         this.selectedSerieId = found.idSerie;
-        this.activeLetterSubject.next(this.getInitial(found.nombreSerie));
+        this.cargarCatalogo();
       },
-      error: (error: Error) => {
-        this.actionError = error.message;
-      }
+      error: (error: Error) => this.actionError = error.message
     });
   }
 
@@ -80,17 +64,26 @@ export class CatalogoComponent {
       return;
     }
 
-    this.seguimientosApiService
-      .addSeriePendiente(this.userSession.usuarioId, serie.idSerie)
-      .pipe(tap(() => this.refreshSubject.next()))
-      .subscribe({
-        next: () => this.actionError = null,
-        error: (error: Error) => this.actionError = error.message
-      });
+    this.seguimientosApiService.addSeriePendiente(this.userSession.usuarioId, serie.idSerie).subscribe({
+      next: () => {
+        this.actionError = null;
+        this.cargarCatalogo();
+      },
+      error: (error: Error) => this.actionError = error.message
+    });
   }
 
   toggleDetalle(serieId: number): void {
     this.selectedSerieId = this.selectedSerieId === serieId ? null : serieId;
+  }
+
+  private cargarCatalogo(): void {
+    this.state = { status: 'loading' };
+
+    this.seriesApiService.getCatalogo(this.userSession.usuarioId, this.activeLetter).subscribe({
+      next: (view) => this.state = { status: 'success', view },
+      error: (error: Error) => this.state = { status: 'error', message: error.message }
+    });
   }
 
   private getInitial(name: string): string {
