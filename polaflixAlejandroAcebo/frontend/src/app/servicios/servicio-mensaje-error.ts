@@ -21,6 +21,22 @@ export class ErrorMessageService {
       return error.error.message;
     }
 
+    if (error.status === 400) {
+      return 'La peticion enviada no es valida. Revisa los datos introducidos.';
+    }
+
+    if (error.status === 404) {
+      return 'No se ha encontrado el recurso solicitado.';
+    }
+
+    if (error.status === 409) {
+      return 'La operacion no se puede completar porque entra en conflicto con los datos actuales.';
+    }
+
+    if (error.status >= 500) {
+      return 'La API ha devuelto un error interno. Revisa el backend.';
+    }
+
     return `Error ${error.status}: no se ha podido completar la operacion.`;
   }
 }

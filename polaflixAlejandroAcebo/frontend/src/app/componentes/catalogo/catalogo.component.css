@@ -17,15 +17,6 @@
   max-width: 660px;
 }
 
-.letters button,
-.title-button {
-  border: 0;
-  background: transparent;
-  color: #087ea4;
-  font-weight: 700;
-  text-decoration: underline;
-}
-
 .letters button {
   display: inline-grid;
   place-items: center;
@@ -94,11 +85,6 @@
   list-style: none;
 }
 
-.catalog-list li.highlight .serie-row {
-  border-radius: 6px;
-  background: #fff2b8;
-}
-
 .serie-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 120px;
@@ -109,9 +95,12 @@
 
 .title-button {
   justify-self: start;
+  border: 0;
+  background: transparent;
   color: var(--color-text);
+  font-weight: 700;
   text-align: left;
-  text-decoration: none;
+  text-decoration: underline;
 }
 
 .title-button:hover {
@@ -142,26 +131,25 @@
   background: var(--color-success);
 }
 
-.synopsis {
+.add-link:disabled {
+  cursor: default;
+}
+
+.serie-detail {
   width: min(680px, 100%);
-  margin-top: 8px;
-  padding: 18px;
-  border-radius: 6px;
-  background: #e5e7eb;
-  color: #374151;
+  margin: 8px 0 0;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  background: #ffffff;
 }
 
-.synopsis button {
-  float: right;
-  background: transparent;
-  color: #4b5563;
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-.synopsis p {
+.serie-detail p {
   margin: 0 0 8px;
-  line-height: 1.5;
+  line-height: 1.4;
+}
+
+.serie-detail p:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 720px) {

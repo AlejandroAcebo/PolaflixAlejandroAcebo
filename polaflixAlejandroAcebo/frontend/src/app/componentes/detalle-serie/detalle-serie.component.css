@@ -1,6 +1,6 @@
 .serie-header {
   display: grid;
-  grid-template-columns: 40px 1fr 40px auto;
+  grid-template-columns: 40px 1fr 40px;
   gap: 14px;
   align-items: center;
   width: min(700px, 100%);
@@ -20,13 +20,6 @@
   font-size: 1.5rem;
 }
 
-.serie-header strong {
-  padding: 6px 10px;
-  background: #777777;
-  color: #ffffff;
-  font-size: 0.85rem;
-}
-
 .episodes {
   width: min(760px, 100%);
   margin: 0 auto;
@@ -34,7 +27,7 @@
 
 .episodes article {
   display: grid;
-  grid-template-columns: 1fr 48px 90px 100px;
+  grid-template-columns: 1fr 70px;
   gap: 12px;
   align-items: start;
   margin-bottom: 10px;
@@ -47,15 +40,24 @@
   text-decoration: underline;
 }
 
-.description-button {
+.chapter-title {
+  justify-self: start;
+  padding: 0;
   text-align: left;
+}
+
+.episodes button:disabled {
+  color: #555555;
+  cursor: default;
+  text-decoration: none;
 }
 
 .episodes p {
   grid-column: 1 / -1;
-  margin: 6px 0 14px;
-  padding: 12px;
-  background: #eeeeee;
+  margin: 4px 0 10px;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  background: #ffffff;
 }
 
 @media (max-width: 640px) {

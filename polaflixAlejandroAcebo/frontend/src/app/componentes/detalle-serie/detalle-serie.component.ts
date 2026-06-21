@@ -18,7 +18,8 @@ type DetailState =
 })
 export class DetalleSerieComponent {
   readonly temporadaIndex$ = new BehaviorSubject<number>(0);
-  readonly descripcionCapituloId$ = new BehaviorSubject<number | null>(null);
+  actionError: string | null = null;
+  selectedCapituloId: number | null = null;
 
   private readonly refresh$ = new BehaviorSubject<void>(undefined);
   private readonly serieId$ = this.route.paramMap.pipe(map((params) => Number(params.get('serieId'))));
@@ -47,23 +48,25 @@ export class DetalleSerieComponent {
   cambiarTemporada(cantidad: number, total: number): void {
     const siguiente = this.temporadaIndex$.value + cantidad;
     if (siguiente >= 0 && siguiente < total) {
-      this.descripcionCapituloId$.next(null);
+      this.actionError = null;
+      this.selectedCapituloId = null;
       this.temporadaIndex$.next(siguiente);
     }
   }
 
-  mostrarDescripcion(idCapitulo: number): void {
-    this.descripcionCapituloId$.next(
-      this.descripcionCapituloId$.value === idCapitulo ? null : idCapitulo
-    );
+  toggleDescripcion(idCapitulo: number): void {
+    this.selectedCapituloId = this.selectedCapituloId === idCapitulo ? null : idCapitulo;
   }
 
   marcarVisto(idCapitulo: number): void {
     this.seriesApiService
       .marcarCapituloComoVisto(this.userSession.usuarioId, idCapitulo)
       .subscribe({
-        next: () => this.refresh$.next(),
-        error: (error: Error) => window.alert(error.message)
+        next: () => {
+          this.actionError = null;
+          this.refresh$.next();
+        },
+        error: (error: Error) => this.actionError = error.message
       });
   }
 }

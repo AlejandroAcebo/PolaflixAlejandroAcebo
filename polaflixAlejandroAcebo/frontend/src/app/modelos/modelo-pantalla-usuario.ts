@@ -30,7 +30,6 @@ export interface CapituloDetalleView {
   idCapitulo: number;
   nombreCapitulo: string;
   numeroCapitulo: number;
-  enlace: string;
   descripcion: string;
   visto: boolean;
 }
@@ -45,7 +44,6 @@ export interface TemporadaDetalleView {
 export interface SerieDetalleView {
   serie: {
     nombreSerie: string;
-    tipoSerie: string;
   };
   temporadas: TemporadaDetalleView[];
   temporadaInicial: number;
@@ -61,7 +59,6 @@ export interface CargoFacturaView {
 export interface FacturaMensualView {
   anio: number;
   mes: number;
-  cuotaFija: boolean;
   cargos: CargoFacturaView[];
   total: number;
 }

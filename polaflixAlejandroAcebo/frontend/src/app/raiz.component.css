@@ -1,6 +1,6 @@
 .app-header {
   display: grid;
-  grid-template-columns: 80px 1fr 80px;
+  grid-template-columns: 120px 1fr 120px;
   gap: 12px;
   align-items: center;
   width: min(960px, calc(100% - 32px));
@@ -9,16 +9,17 @@
   border-bottom: 1px solid #777777;
 }
 
-.logo-box {
-  display: grid;
-  place-items: center;
-  width: 58px;
-  height: 38px;
-  border: 1px solid #777777;
-  background: #ffffff;
+.brand {
   color: #222222;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.brand:focus-visible {
+  outline: 2px solid #006fc9;
+  outline-offset: 3px;
 }
 
 .app-header h1 {
@@ -49,12 +50,11 @@
 
 @media (max-width: 640px) {
   .app-header {
-    grid-template-columns: 64px 1fr;
+    grid-template-columns: 96px 1fr;
   }
 
   .app-header h1 {
     grid-column: 1 / -1;
     text-align: left;
   }
-
 }

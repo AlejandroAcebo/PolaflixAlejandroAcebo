@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { BehaviorSubject, catchError, combineLatest, map, Observable, of, startWith, switchMap, tap } from 'rxjs';
 
-import { SerieCatalogoView } from '../../modelos/modelo-pantalla-usuario';
+import { CatalogoView, SerieCatalogoView } from '../../modelos/modelo-pantalla-usuario';
 import { SeguimientosApiService } from '../../servicios/servicio-seguimientos-api';
 import { SeriesApiService } from '../../servicios/servicio-series-api';
 import { UserSessionService } from '../../servicios/servicio-sesion-usuario';
@@ -9,13 +9,7 @@ import { UserSessionService } from '../../servicios/servicio-sesion-usuario';
 type SeriesListState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'success'; view: CatalogView };
-
-interface CatalogView {
-  activeLetter: string;
-  highlightedSerieId: number | null;
-  series: SerieCatalogoView[];
-}
+  | { status: 'success'; view: CatalogoView };
 
 @Component({
   selector: 'app-series-list-page',
@@ -24,28 +18,23 @@ interface CatalogView {
 })
 export class CatalogoComponent {
   readonly letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0-9'.split('');
-  readonly expandedSerieId$ = new BehaviorSubject<number | null>(null);
+  actionError: string | null = null;
+  selectedSerieId: number | null = null;
 
   private readonly activeLetterSubject = new BehaviorSubject<string>('A');
-  private readonly highlightedSerieIdSubject = new BehaviorSubject<number | null>(null);
   private readonly refreshSubject = new BehaviorSubject<void>(undefined);
 
   readonly activeLetter$ = this.activeLetterSubject.asObservable();
 
   readonly state$: Observable<SeriesListState> = combineLatest([
     this.activeLetterSubject,
-    this.highlightedSerieIdSubject,
     this.refreshSubject
   ]).pipe(
-    switchMap(([activeLetter, highlightedSerieId]) =>
+    switchMap(([activeLetter]) =>
       this.seriesApiService.getCatalogo(this.userSession.usuarioId, activeLetter).pipe(
         map((catalogo) => ({
           status: 'success',
-          view: {
-            activeLetter: catalogo.inicial,
-            highlightedSerieId,
-            series: catalogo.series
-          }
+          view: catalogo
         }) as SeriesListState)
       )
     ),
@@ -60,7 +49,8 @@ export class CatalogoComponent {
   ) {}
 
   setLetter(letter: string): void {
-    this.highlightedSerieIdSubject.next(null);
+    this.actionError = null;
+    this.selectedSerieId = null;
     this.activeLetterSubject.next(letter);
   }
 
@@ -75,14 +65,12 @@ export class CatalogoComponent {
 
     this.seriesApiService.buscarSerieCatalogo(this.userSession.usuarioId, normalizedTerm).subscribe({
       next: (found) => {
-        this.expandedSerieId$.next(found.idSerie);
-        this.highlightedSerieIdSubject.next(found.idSerie);
+        this.actionError = null;
+        this.selectedSerieId = found.idSerie;
         this.activeLetterSubject.next(this.getInitial(found.nombreSerie));
       },
       error: (error: Error) => {
-        this.expandedSerieId$.next(null);
-        this.highlightedSerieIdSubject.next(null);
-        window.alert(error.message);
+        this.actionError = error.message;
       }
     });
   }
@@ -96,13 +84,13 @@ export class CatalogoComponent {
       .addSeriePendiente(this.userSession.usuarioId, serie.idSerie)
       .pipe(tap(() => this.refreshSubject.next()))
       .subscribe({
-        error: (error: Error) => window.alert(error.message)
+        next: () => this.actionError = null,
+        error: (error: Error) => this.actionError = error.message
       });
   }
 
-  toggleSynopsis(serieId: number): void {
-    const nextId = this.expandedSerieId$.value === serieId ? null : serieId;
-    this.expandedSerieId$.next(nextId);
+  toggleDetalle(serieId: number): void {
+    this.selectedSerieId = this.selectedSerieId === serieId ? null : serieId;
   }
 
   private getInitial(name: string): string {

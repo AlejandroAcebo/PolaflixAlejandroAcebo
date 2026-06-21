@@ -5,30 +5,30 @@
     <app-error-alert *ngIf="state.status === 'error'" [message]="state.message"></app-error-alert>
 
     <ng-container *ngIf="state.status === 'success'">
+      <app-error-alert *ngIf="actionError as actionErrorMessage" [message]="actionErrorMessage"></app-error-alert>
+
       <ng-container *ngIf="{ index: (temporadaIndex$ | async) ?? 0 } as temporadaState">
         <header class="serie-header">
-          <button type="button" (click)="cambiarTemporada(-1, state.view.temporadas.length)">◀</button>
+          <button type="button" aria-label="Temporada anterior" (click)="cambiarTemporada(-1, state.view.temporadas.length)">&lt;</button>
           <h2>
             {{ state.view.serie.nombreSerie }}
             <span *ngIf="temporadaSeleccionada(state.view.temporadas, temporadaState.index) as temporada">
               - {{ temporada.nombreTemporada }}
             </span>
           </h2>
-          <button type="button" (click)="cambiarTemporada(1, state.view.temporadas.length)">▶</button>
-          <strong>{{ state.view.serie.tipoSerie }}</strong>
+          <button type="button" aria-label="Temporada siguiente" (click)="cambiarTemporada(1, state.view.temporadas.length)">&gt;</button>
         </header>
 
         <section *ngIf="temporadaSeleccionada(state.view.temporadas, temporadaState.index) as temporada" class="episodes">
           <article *ngFor="let capitulo of temporada.capitulos">
-            <span>Ep{{ capitulo.numeroCapitulo }}. {{ capitulo.nombreCapitulo }}</span>
-            <button type="button" (click)="marcarVisto(capitulo.idCapitulo)">Ver</button>
-            <span>{{ capitulo.visto ? 'Visto' : 'Pendiente' }}</span>
-
-            <button type="button" class="description-button" (click)="mostrarDescripcion(capitulo.idCapitulo)">
-              Descripcion
+            <button type="button" class="chapter-title" (click)="toggleDescripcion(capitulo.idCapitulo)">
+              Ep{{ capitulo.numeroCapitulo }}. {{ capitulo.nombreCapitulo }}
+            </button>
+            <button type="button" [disabled]="capitulo.visto" (click)="marcarVisto(capitulo.idCapitulo)">
+              {{ capitulo.visto ? 'Visto' : 'Ver' }}
             </button>
 
-            <p *ngIf="(descripcionCapituloId$ | async) === capitulo.idCapitulo">
+            <p *ngIf="selectedCapituloId === capitulo.idCapitulo">
               {{ capitulo.descripcion }}
             </p>
           </article>

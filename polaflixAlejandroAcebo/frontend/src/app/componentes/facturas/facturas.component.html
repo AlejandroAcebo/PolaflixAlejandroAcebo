@@ -6,9 +6,9 @@
 
     <ng-container *ngIf="state.status === 'success'">
       <header class="month-nav">
-        <button type="button" aria-label="Mes anterior" (click)="cambiarMes(-1)">◀</button>
+        <button type="button" aria-label="Mes anterior" (click)="cambiarMes(-1)">&lt;</button>
         <h2>{{ state.fecha | date: 'MMMM yyyy' }}</h2>
-        <button type="button" aria-label="Mes siguiente" (click)="cambiarMes(1)">▶</button>
+        <button type="button" aria-label="Mes siguiente" (click)="cambiarMes(1)">&gt;</button>
       </header>
 
       <table>

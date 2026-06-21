@@ -1,7 +1,6 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './rutas-app.module';
 import { AppComponent } from './raiz.component';
@@ -13,7 +12,6 @@ import { DetalleSerieComponent } from './componentes/detalle-serie/detalle-serie
 import { FacturasComponent } from './componentes/facturas/facturas.component';
 import { InicioComponent } from './componentes/inicio/inicio.component';
 import { ListaPersonalComponent } from './componentes/lista-personal/lista-personal.component';
-import { PlantillaComponent } from './componentes/plantilla/plantilla.component';
 import { SinDatosComponent } from './compartido/sin-datos/sin-datos.component';
 
 @NgModule({
@@ -26,12 +24,10 @@ import { SinDatosComponent } from './compartido/sin-datos/sin-datos.component';
     FacturasComponent,
     InicioComponent,
     ListaPersonalComponent,
-    PlantillaComponent,
     SinDatosComponent
   ],
   imports: [
     BrowserModule,
-    BrowserAnimationsModule,
     AppRoutingModule
   ],
   providers: [provideHttpClient(withInterceptors([apiHeadersInterceptor]))],

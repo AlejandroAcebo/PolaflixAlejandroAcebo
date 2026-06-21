@@ -17,6 +17,8 @@
     </form>
   </header>
 
+  <app-error-alert *ngIf="actionError as actionErrorMessage" [message]="actionErrorMessage"></app-error-alert>
+
   <ng-container *ngIf="state$ | async as state">
     <app-loading-state *ngIf="state.status === 'loading'" message="Cargando series..."></app-loading-state>
 
@@ -33,12 +35,9 @@
       ></app-empty-state>
 
       <ul *ngIf="state.view.series.length > 0" class="catalog-list">
-        <li
-          *ngFor="let serie of state.view.series"
-          [class.highlight]="state.view.highlightedSerieId === serie.idSerie"
-        >
+        <li *ngFor="let serie of state.view.series">
           <div class="serie-row">
-            <button type="button" class="title-button" (click)="toggleSynopsis(serie.idSerie)">
+            <button type="button" class="title-button" (click)="toggleDetalle(serie.idSerie)">
               {{ serie.nombreSerie }}
             </button>
 
@@ -46,18 +45,18 @@
               type="button"
               class="add-link"
               [class.added]="serie.agregada"
+              [disabled]="serie.agregada"
               (click)="addSerie(serie)"
             >
               {{ serie.agregada ? 'Agregada' : 'Agregar' }}
             </button>
           </div>
 
-          <aside *ngIf="(expandedSerieId$ | async) === serie.idSerie" class="synopsis">
-            <button type="button" aria-label="Cerrar sinopsis" (click)="toggleSynopsis(serie.idSerie)">x</button>
+          <section *ngIf="selectedSerieId === serie.idSerie" class="serie-detail">
             <p>{{ serie.sinopsis }}</p>
             <p><strong>Creador:</strong> {{ serie.creadores.join(', ') || 'No disponible' }}</p>
             <p><strong>Actores:</strong> {{ serie.actores.join(', ') || 'No disponible' }}</p>
-          </aside>
+          </section>
         </li>
       </ul>
     </ng-container>
